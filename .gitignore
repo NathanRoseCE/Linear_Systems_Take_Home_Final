@@ -1,0 +1,9 @@
+
+# pdflatex files
+*.aux
+*.log
+*.out
+auto/
+
+# compiled python
+*.pyc

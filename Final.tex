@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage[shortlabels]{enumitem}
+\usepackage{mathrsfs}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage[export]{adjustbox} 
+\geometry{letterpaper, margin=0.75in}
+\setlength\parindent{0pt}
+\title{Take Home Final}
+\author{Nathan Rose}
+\date{\today}
+
+\newcommand\question[4]{
+  
+  \textbf{\Large{#1 - #2}}\phantom{.}\\
+  #3\phantom{.}
+
+  \finalAnswer{#4}\phantom{.}
+}
+
+\newcommand\finalAnswer[1]{
+  \large{
+  Final Answer:
+  
+  #1
+  }  
+}
+
+\newcommand{\TODO}[1]{{\LARGE \color{red} TODO: #1}}
+\newcommand\laplace[1]{\mathscr{L}\{#1\}}
+\newcommand\laplaceinv[1]{\mathscr{L}^{-1}\{#1\}}
+
+\begin{document}
+\maketitle
+\question{1}{
+  A High performance helicopter has a model shown in Figure 1. The goal is to control the pitch angle $\theta$
+  of the helicopter by adjusting the rotor thrust $\delta$. The equations of motion of the helicopter are
+  \TODO{add figure}
+  \begin{equation}
+    \frac {d^2\theta}{dt^2} = -\sigma_1 \frac{d\theta}{dt} - \alpha \frac{dx}{dt} +n\delta
+  \end{equation}
+  \begin{equation}
+    \frac{d^2x}{dt^2} = g\theta - \alpha_2 \frac{d\theta}{dx} - \sigma_2 \frac{dx}{dt} + g\delta
+  \end{equation}
+  Where x is teh translation in the horizontal direction. FOr a miltary high-preformance helicopter we find:
+  $\sigma_1 = 0.415$, $\sigma_2 = 0.0198$, $\alpha_1 = 0.0111$,$\alpha_2 = 1.43$, $n=6.27$, $g=9.8$ all in
+  appropriate SI units.
+  Find:
+  \begin{enumerate}[(\alph*)]
+  \item A state variable representation of this system
+  \item The transfer function representation for $\frac{\theta(s)}{\delta(s)}$
+  \item Use state variable feedback to achieve adaquate performances for the controlled system.
+    Desired specifications include:\label{step:specifications}
+    \begin{enumerate}[(\arabic*)]
+    \item A steady-state for an input step command for $\theta_d(s)$, the desired pitch angle, less than
+      20\% of the input step magnitude
+    \item An overshoot for a step input command is less than 20\%
+    \item a settling (with a 2\% criterion) time for a step command of less than 1.5 seconds
+    \end{enumerate}
+  \item If the state variable is not available, design the observer and control law to meet the design
+    specifications included in part \ref{step:specifications}
+  \end{enumerate}
+}{}{}
+\end{document}
