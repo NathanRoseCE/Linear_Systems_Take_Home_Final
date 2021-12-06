@@ -14,5 +14,6 @@ python3 questionTwo.py
 
 cd ..
 
-pdflatex Final.tex
-pdflatex Final.tex
+bazel build ee510final
+# pdflatex Final.tex
+# pdflatex Final.tex

@@ -1,0 +1,14 @@
+load("@bazel_latex//:latex.bzl", "latex_document")
+
+latex_document(
+    name = "ee510final",
+    srcs = glob([
+        "*.tex",
+        "resources/*.png",
+        "scripts/results/*.tex",
+        "scripts/results/*.png",
+    ]) + [
+        "@bazel_latex//packages:biblatex",
+    ],
+    main = "Final.tex",
+)
