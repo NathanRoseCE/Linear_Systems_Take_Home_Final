@@ -1,0 +1,29 @@
+{
+    "sigma_1": 0.415,
+    "sigma_2": 0.0198,
+    "alpha_1": 0.0111,
+    "alpha_2": 1.43,
+    "n": 6.27,
+    "g": 9.8,
+    "tex_a_fragment": "results/one_a.tex",
+    "tex_b_fragment": "results/one_b.tex",
+    "tex_c_fragment": "results/one_c.tex",
+    "tex_d_fragment": "results/one_d.tex",
+    "Q": [[1, 0],
+	  [0, 1]],
+    "R": [[1]],
+    "L0": [[ 1, 0],
+	   [ 0, 1],
+	   [ 1, 0],
+	   [ 0, 1]],
+    "desired_eig": [
+	{
+	    "real": -2,
+	    "imaginary": 1
+	},
+	{
+	    "real": -1,
+	    "imaginary": 1
+	}
+    ]
+}

@@ -1,12 +1,13 @@
 import numpy as np
 from copy import deepcopy
+from typing import Tuple, List
 
 
-def linearWithFeedback(system: tuple[np.matrix],
+def linearWithFeedback(system: Tuple[np.matrix],
                        k: np.matrix,
                        initialState: np.matrix,
                        dt: float,
-                       inputs: list[np.matrix]) -> list[np.matrix]:
+                       inputs: List[np.matrix]) -> List[np.matrix]:
     """
     Models a linear system with state feedback, assumes system.A is without 
     feedback,
@@ -16,8 +17,11 @@ def linearWithFeedback(system: tuple[np.matrix],
     output is of the observer
     """
     outputs = []
-    x = initialState
-    A, B, C, D = system
+    x = deepcopy(initialState)
+    A, B, C, D = deepcopy(system)
+    k = deepcopy(k)
+    dt = deepcopy(dt)
+    inputs = deepcopy(inputs)
 
     # Adjust A based off feedback
     A = A - (B*k)
@@ -28,13 +32,13 @@ def linearWithFeedback(system: tuple[np.matrix],
     return outputs
 
 
-def linearFullObserverWithFeedback(system: tuple[np.matrix],
+def linearFullObserverWithFeedback(system: Tuple[np.matrix],
                                    L: np.matrix,
                                    k: np.matrix,
                                    x_0: np.matrix,
                                    x_e_0: np.matrix,
                                    dt: float,
-                                   inputs: list[np.matrix]) -> list[np.matrix]:
+                                   inputs: List[np.matrix]) -> List[np.matrix]:
     """
     Models a linear system with state feedback, assumes system.A is without
     feedback,
@@ -42,6 +46,10 @@ def linearFullObserverWithFeedback(system: tuple[np.matrix],
     y = Cx + Du
     u = r + kx
     """
+    L = deepcopy(L)
+    k = deepcopy(k)
+    dt = deepcopy(dt)
+    inputs = deepcopy(inputs)
     outputs = []
     A, B, C, D = deepcopy(system)
     x = deepcopy(x_0)
@@ -64,7 +72,7 @@ def linearFullObserverWithFeedback(system: tuple[np.matrix],
     return outputs
 
 
-def linearStep(x: np.matrix, u: np.matrix, dt: float, system: tuple[np.matrix]) -> tuple[np.matrix]:
+def linearStep(x: np.matrix, u: np.matrix, dt: float, system: Tuple[np.matrix]) -> Tuple[np.matrix]:
     A, B, C, D = system
     dot_x = A*x + B*u
     x += dt * dot_x

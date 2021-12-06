@@ -4,12 +4,12 @@
   helicopter are
   \image{resources/helicopter.png}{\phantom{x}}{fig:helicopter}
   \begin{equation}
-    \frac {d^2\theta}{dt^2} = -\sigma_1 \frac{d\theta}{dt} - \alpha \frac{dx}{dt} +n\delta
+    \frac {d^2\theta}{dt^2} = -\sigma_1 \frac{d\theta}{dt} - \alpha_1 \frac{dx}{dt} +n\delta
   \end{equation}
   \begin{equation}
-    \frac{d^2x}{dt^2} = g\theta - \alpha_2 \frac{d\theta}{dx} - \sigma_2 \frac{dx}{dt} + g\delta
+    \frac{d^2x}{dt^2} = g\theta - \alpha_2 \frac{d\theta}{dt} - \sigma_2 \frac{dx}{dt} + g\delta
   \end{equation}
-  Where x is teh translation in the horizontal direction. FOr a miltary high-preformance helicopter we find:
+  Where x is the translation in the horizontal direction. For a miltary high-preformance helicopter we find:
   $\sigma_1 = 0.415$, $\sigma_2 = 0.0198$, $\alpha_1 = 0.0111$,$\alpha_2 = 1.43$, $n=6.27$, $g=9.8$ all in
   appropriate SI units.
   Find:
@@ -30,8 +30,9 @@
 }{
   \begin{enumerate}[(\alph*)]
   \item A state variable representation of this system \\
-    
-  \item The transfer function representation for $\frac{\theta(s)}{\delta(s)}$
+    \subimport{./scripts/results/}{one_a.tex}
+  \item The transfer function representation for $\frac{\theta(s)}{\delta(s)}$\\
+    \subimport{./scripts/results/}{one_b.tex}
   \item Use state variable feedback to achieve adaquate performances for the controlled system.
     Desired specifications include:\label{step:specifications}
     \begin{enumerate}[(\arabic*)]

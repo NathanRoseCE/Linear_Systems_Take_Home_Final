@@ -1,36 +1,23 @@
 For the system described by: 
 \begin{equation}
-\dot x = 
-\begin{bmatrix}
-  0 & 1 & 0\\
-  0 & 0 & 1\\
-  -1 & 4 & 5\\
-\end{bmatrix}x + 
-\begin{bmatrix}
-  0\\
-  0\\
-  2\\
-\end{bmatrix}u
+\dot x = \begin{bmatrix}
+0&1&0\\0&0&1\\-1&4&5\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\0\\2\\\end{bmatrix}
+u
 \end{equation}
 \begin{equation}
-\dot x = 
-\begin{bmatrix}
-  0 & 1 & 0\\
-  0 & 0 & 1\\
-\end{bmatrix}x + 
-\begin{bmatrix}
-  0\\
-  0\\
-\end{bmatrix}u
+y = \begin{bmatrix}
+0&1&0\\0&0&1\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\0\\\end{bmatrix}
+u
 \end{equation}
- and $Q = 
-\begin{bmatrix}
-  1 & 0\\
-  0 & 1\\
-\end{bmatrix}$,$R = 
-\begin{bmatrix}
-  1\\
-\end{bmatrix}$
+ and $Q = \begin{bmatrix}
+1&0\\0&1\\\end{bmatrix}
+$,$R = \begin{bmatrix}
+1\\\end{bmatrix}
+$
 
 The following is the outputs of the LQR system assuming the inputs are 0
 

@@ -1,23 +1,32 @@
 import numpy as np
 import os
+from control import tf
+from typing import List, Tuple
+
+ROUND_TO = 3
 
 
-def matrix(matrix: np.matrix, latexMatrixType: str) -> str:
-    """ 
-    returns a latex bmatrix formatted string
-    """
-    lines = str(matrix).replace('[', '').replace(']', '').splitlines()
-    rv = [os.linesep + r'\begin{' + latexMatrixType + '}']
-    rv += ['  ' + ' & '.join(line.split()) + r'\\' for line in lines]
-    rv += [r'\end{' + latexMatrixType + '}']
-    return '\n'.join(rv)
+def matrix_List(vals: List, latexMatrixType: str) -> str:
+    latexMatrixString = r"\begin{" + latexMatrixType + r"}" + os.linesep
+    for row in vals:
+        for i, column in enumerate(row):
+            if type(column) == float:
+                column = round(column, ROUND_TO)
+            latexMatrixString += str(column)
+            if not i == len(row)-1:
+                latexMatrixString += r"&"
+        latexMatrixString += r"\\"
+    latexMatrixString += r"\end{" + latexMatrixType + r"}" + os.linesep
+    return latexMatrixString
 
 
-def bmatrix(mat: np.matrix) -> str:
-    return matrix(mat, "bmatrix")
+def bmatrix(mat: List[List[float]]) -> str:
+    if type(mat).__module__ == np.__name__:
+        mat = mat.tolist()
+    return matrix_List(mat, "bmatrix")
 
 
-def system(system: tuple[np.matrix]) -> str:
+def system(system: Tuple[np.matrix]) -> str:
     A, B, C, D = system
     result = ""
     result += r"\begin{equation}" + os.linesep
@@ -25,7 +34,44 @@ def system(system: tuple[np.matrix]) -> str:
     result += bmatrix(B) + "u" + os.linesep
     result += r"\end{equation}" + os.linesep
     result += r"\begin{equation}" + os.linesep
-    result += r"\dot x = " + bmatrix(C) + "x + "
+    result += r"y = " + bmatrix(C) + "x + "
     result += bmatrix(D) + "u" + os.linesep
     result += r"\end{equation}" + os.linesep
     return result
+
+
+def transferFunction(transfer: tf) -> str:
+    scipyLTI = transfer.returnScipySignalLTI()
+    lti_response = []
+    for output in scipyLTI:
+        out_responses = []
+        for input in output:
+            out_responses.append(frac("s", input.num, input.den))
+        lti_response.append(out_responses)
+    return bmatrix(lti_response)
+
+
+def frac(var: str, numerator: List[float], denominator: List[float]) -> str:
+    frac_str = r"\frac{"
+    frac_str += polynomial(var, numerator)
+    frac_str += r"}{"
+    frac_str += polynomial(var, denominator)
+    frac_str += r"}"
+    return frac_str
+
+
+def polynomial(var: str, coefficents: List[float]) -> str:
+    poly_str = ""
+    for i, num in enumerate(coefficents):
+        rounded = round(num, ROUND_TO)
+        if rounded != 0:
+            sign = ""
+            if not i == 0:
+                sign = (" + " if rounded > 0 else " - ")
+            poly_str += sign + str(abs(rounded))
+            exponent = len(coefficents)-i-1
+            if not exponent == 0:
+                poly_str += "s"
+                if not exponent == 1:
+                    poly_str += r"^{" + str(exponent) + r"}"
+    return poly_str

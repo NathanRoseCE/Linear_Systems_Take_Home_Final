@@ -6,6 +6,7 @@ from control import lqr
 from control import lyap
 import matplotlib.pyplot as plt
 import json
+from typing import List, Tuple
 
 TWO_CONFIG_FILE = "resources/two.json"
 
@@ -18,7 +19,7 @@ def linearSystem(config: json):
     return A, B, C, D
 
 
-def validResultsOne(config: json, k: np.matrix, outputs: np.matrix, times: list[float]) -> bool:
+def validResultsOne(config: json, k: np.matrix, outputs: np.matrix, times: List[float]) -> bool:
     """
     Checks to ensure that the results are valid for question 2-1
     """
@@ -36,7 +37,7 @@ def validResultsOne(config: json, k: np.matrix, outputs: np.matrix, times: list[
     return True
 
 
-def validResultsTwo(config: json, L: np.matrix, outputs: np.matrix, times: list[float]) -> bool:
+def validResultsTwo(config: json, L: np.matrix, outputs: np.matrix, times: List[float]) -> bool:
     """
     Checks to ensure that the results are valid for question 2-2
     """
@@ -48,18 +49,18 @@ def validResultsTwo(config: json, L: np.matrix, outputs: np.matrix, times: list[
     return True
 
 
-def feedback(system: tuple[np.matrix], q: np.matrix, r: np.matrix) -> np.matrix:
+def feedback(system: Tuple[np.matrix], q: np.matrix, r: np.matrix) -> np.matrix:
     A, B, C, D = system
     k, s, e = lqr(A, B, C.T*q*C, r)
     return k
 
 
-def gen_inputs(stopTime: float, dt: float) -> tuple[list[float]]:
+def gen_inputs(stopTime: float, dt: float) -> Tuple[List[float]]:
     return ([np.matrix([[1.0]]) for i in np.arange(0, stopTime, dt)],
             [timeStep for timeStep in np.arange(0, stopTime, dt)])
 
 
-def part_one(system: tuple[np.matrix], one_config: json) -> bool:
+def part_one(system: Tuple[np.matrix], one_config: json) -> bool:
     A, B, C, D = system
     q = np.matrix(one_config["Q"])
     r = np.matrix(one_config["R"])
@@ -77,7 +78,7 @@ def part_one(system: tuple[np.matrix], one_config: json) -> bool:
     return success
 
 
-def part_two(system: tuple[np.matrix], config: json) -> bool:
+def part_two(system: Tuple[np.matrix], config: json) -> bool:
     A, B, C, D = system
     k = feedback(system,
                  np.matrix(np.matrix(config["Q"])),
@@ -97,7 +98,7 @@ def part_two(system: tuple[np.matrix], config: json) -> bool:
     return success
 
 
-def F(desiredEigens: list[dict], shape):
+def F(desiredEigens: List[dict], shape):
     F = np.zeros(shape, float)
     i = 0
     for desired_eig in desiredEigens:
@@ -125,7 +126,7 @@ def main() -> bool:
     return success
 
 
-def graph_results(timeSteps: list[float], outputs: np.matrix, success:bool, save_file: str, title_name):
+def graph_results(timeSteps: List[float], outputs: np.matrix, success:bool, save_file: str, title_name):
     fig = plt.figure()
     axis = fig.add_axes([0.1, 0.1, 0.75, 0.75])
     outputs = np.concatenate(outputs, axis=1)
@@ -143,7 +144,7 @@ def graph_results(timeSteps: list[float], outputs: np.matrix, success:bool, save
         fig.show()
 
 
-def output_results_one(system: tuple[np.matrix],
+def output_results_one(system: Tuple[np.matrix],
                        Q: np.matrix,
                        R: np.matrix,
                        outputFile: str):
@@ -160,7 +161,7 @@ def output_results_one(system: tuple[np.matrix],
                   r"{fig:two_one}")
 
 
-def output_results_two(system: tuple[np.matrix],
+def output_results_two(system: Tuple[np.matrix],
                        F: np.matrix,
                        T: np.matrix,
                        L0: np.matrix,

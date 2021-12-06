@@ -1,67 +1,42 @@
 For the system described by: 
 \begin{equation}
-\dot x = 
-\begin{bmatrix}
-  0 & 1 & 0\\
-  0 & 0 & 1\\
-  -1 & 4 & 5\\
-\end{bmatrix}x + 
-\begin{bmatrix}
-  0\\
-  0\\
-  2\\
-\end{bmatrix}u
+\dot x = \begin{bmatrix}
+0&1&0\\0&0&1\\-1&4&5\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\0\\2\\\end{bmatrix}
+u
 \end{equation}
 \begin{equation}
-\dot x = 
-\begin{bmatrix}
-  0 & 1 & 0\\
-  0 & 0 & 1\\
-\end{bmatrix}x + 
-\begin{bmatrix}
-  0\\
-  0\\
-\end{bmatrix}u
+y = \begin{bmatrix}
+0&1&0\\0&0&1\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\0\\\end{bmatrix}
+u
 \end{equation}
 The following variables were chosen for the observer:
 
 \begin{tabular}{r|l}
-$L_0$ & $
-\begin{bmatrix}
-  0. & 1.\\
-  0.5 & 0.\\
-  0.1 & 0.25\\
-\end{bmatrix}$\\
-$F$ & $
-\begin{bmatrix}
-  -5. & 5. & 0.\\
-  -5. & -5. & 0.\\
-  0. & 0. & -5.\\
-\end{bmatrix}$\\
+$L_0$ & $\begin{bmatrix}
+0.0&1.0\\0.5&0.0\\0.1&0.25\\\end{bmatrix}
+$\\
+$F$ & $\begin{bmatrix}
+-5.0&5.0&0.0\\-5.0&-5.0&0.0\\0.0&0.0&-5.0\\\end{bmatrix}
+$\\
 \end{tabular}
 
 These were used to calculate: 
 
 \begin{tabular}{r|l}
-$T$ & $
-\begin{bmatrix}
-  0.00264941 & 0.04032866 & 0.07280946\\
-  -0.01191248 & 0.09910611 & -0.04631534\\
-  0.00502183 & -0.0010917 & 0.02510917\\
-\end{bmatrix}$\\
-$L$ & $
-\begin{bmatrix}
-  55.62246651 & -6.38612161\\
-  8.56733081 & 4.57523188\\
-  -6.76939196 & 11.43266919\\
-\end{bmatrix}$\\
+$T$ & $\begin{bmatrix}
+0.003&0.04&0.073\\-0.012&0.099&-0.046\\0.005&-0.001&0.025\\\end{bmatrix}
+$\\
+$L$ & $\begin{bmatrix}
+55.622&-6.386\\8.567&4.575\\-6.769&11.433\\\end{bmatrix}
+$\\
 \end{tabular}
 
-The following is the outputs of the LQR system assuming the inputs are 0 and an initial estimate of state of $
-\begin{bmatrix}
-  1.\\
-  -1.\\
-  1.\\
-\end{bmatrix}$
+The following is the outputs of the LQR system assuming the inputs are 0 and an initial estimate of state of $\begin{bmatrix}
+1.0\\-1.0\\1.0\\\end{bmatrix}
+$
 
 \image{two_two_output.png}{LQR system}{fig:two_two}

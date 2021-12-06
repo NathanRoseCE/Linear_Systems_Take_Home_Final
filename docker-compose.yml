@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  eefinal:
+    build: .
+    volumes:
+      - .:/usr/src/Final/:z
+    

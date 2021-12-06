@@ -1,0 +1,21 @@
+For the system with state variables:\begin{equation}
+x = 
+\begin{bmatrix}
+x\\
+\dot x\\
+\theta\\
+\dot \theta\\
+\end{bmatrix}\end{equation}The state space representation is: \begin{equation}
+\dot x = \begin{bmatrix}
+0&1&0&0\\0&-\sigma_2&g&-\alpha_1\\0&0&0&1\\0&-\sigma_1&0&-\alpha_1\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\g\\0\\n\\\end{bmatrix}
+u
+\end{equation}
+\begin{equation}
+y = \begin{bmatrix}
+1&0&0&0\\0&0&1&0\\\end{bmatrix}
+x + \begin{bmatrix}
+0\\0\\\end{bmatrix}
+u
+\end{equation}
