@@ -1,17 +1,31 @@
 For the system described by: \begin{equation}
 \dot x = \begin{bmatrix}
-0.0&1.0&0.0&0.0\\0.0&-0.02&9.8&-1.43\\0.0&0.0&0.0&1.0\\0.0&-0.415&0.0&-0.011\\\end{bmatrix}
+0.0&1.0&0.0&0.0\\
+0.0&-0.02&9.8&-1.43\\
+0.0&0.0&0.0&1.0\\
+0.0&-0.415&0.0&-0.011\\
+\end{bmatrix}
 x + \begin{bmatrix}
-0.0\\9.8\\0.0\\6.27\\\end{bmatrix}
+0.0\\
+9.8\\
+0.0\\
+6.27\\
+\end{bmatrix}
 u
 \end{equation}
 \begin{equation}
 y = \begin{bmatrix}
-1&0&0&0\\0&0&1&0\\\end{bmatrix}
+1&0&0&0\\
+0&0&1&0\\
+\end{bmatrix}
 x + \begin{bmatrix}
-0\\0\\\end{bmatrix}
+0\\
+0\\
+\end{bmatrix}
 u
 \end{equation}
 A realization was determined by taking the realization of the state space representation. The result of this is: \begin{equation}g(s) = \begin{bmatrix}
-\frac{9.8s^{2} - 8.857s + 61.446}{1.0s^{4} + 0.031s^{3} - 0.593s^{2} + 4.067s}\\\frac{6.27s^{2} - 3.943s}{1.0s^{4} + 0.031s^{3} - 0.593s^{2} + 4.067s}\\\end{bmatrix}
+\frac{9.8s^{2} - 8.857s + 61.446}{1.0s^{4} + 0.031s^{3} - 0.593s^{2} + 4.067s}\\
+\frac{6.27s^{2} - 3.943s}{1.0s^{4} + 0.031s^{3} - 0.593s^{2} + 4.067s}\\
+\end{bmatrix}
 \end{equation}

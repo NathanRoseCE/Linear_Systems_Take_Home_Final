@@ -1,6 +1,30 @@
 import numpy as np
 from copy import deepcopy
 from typing import Tuple, List
+from typing import Callable
+
+
+def ModelSystem(update: Callable[[np.matrix, np.matrix], np.matrix],
+                output: Callable[[np.matrix, np.matrix], np.matrix],
+                x_0: np.matrix,
+                inputs: List[np.matrix],
+                *args) -> List[Tuple]:
+    """
+    A generic model for any system  can work with linear and nonlinear
+    systems. update functions returns the next state, and output outputs
+    the output matrix. Both of these functions take in state, system input, 
+    then *args.
+    This function will return list of outputs
+
+    This is an underlying function see other models for examples
+    """
+    outputs = []
+    x = deepcopy(x_0)
+    inputs = deepcopy(inputs)
+    for r in inputs:
+        x = update(x, r, *args)
+        outputs.append(output(x, r, *args))
+    return outputs
 
 
 def linearWithFeedback(system: Tuple[np.matrix],
@@ -16,8 +40,7 @@ def linearWithFeedback(system: Tuple[np.matrix],
     u = r + kx
     output is of the observer
     """
-    outputs = []
-    x = deepcopy(initialState)
+    x_0 = deepcopy(initialState)
     A, B, C, D = deepcopy(system)
     k = deepcopy(k)
     dt = deepcopy(dt)
@@ -25,11 +48,12 @@ def linearWithFeedback(system: Tuple[np.matrix],
 
     # Adjust A based off feedback
     A = A - (B*k)
-    for r in inputs:
-        dot_x = (A*x) + (B*r)
-        x += dot_x*dt
-        outputs.append((C*x) + D)
-    return outputs
+    return ModelSystem(_linearUpdate,
+                       _linearOutput,
+                       x_0,
+                       inputs,
+                       (A, B, C, D),
+                       dt)
 
 
 def linearFullObserverWithFeedback(system: Tuple[np.matrix],
@@ -62,8 +86,8 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
         u = r - (k*x_e)
 
         # system step
-        x, y = linearStep(x, u, dt, (A, B, C, D))
-
+        x = _linearUpdate(x, u, (A, B, C, D), dt)
+        y = _linearOutput(x, u, (A, B, C, D), dt)
         # estimator step
         dot_x_e = (A*x_e) + (B*u) + L*(y-y_e)
         x_e += dot_x_e*dt
@@ -72,9 +96,24 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
     return outputs
 
 
-def linearStep(x: np.matrix, u: np.matrix, dt: float, system: Tuple[np.matrix]) -> Tuple[np.matrix]:
+def _linearUpdate(x: np.matrix,
+                  r: np.matrix,
+                  system: Tuple[np.matrix],
+                  dt: float) -> np.matrix:
+    """
+    Linear update step, determines the next state for a linera system
+    """
     A, B, C, D = system
-    dot_x = A*x + B*u
-    x += dt * dot_x
-    y = C*x + D*u
-    return x, y
+    dx = (A*x) + (B*r)
+    return x + (dx*dt)
+
+
+def _linearOutput(x: np.matrix,
+                  r: np.matrix,
+                  system: Tuple[np.matrix],
+                  dt: float) -> np.matrix:
+    """
+    Linear output step, determine the output for a linear system
+    """
+    A, B, C, D = system
+    return (C*x) + (D*r)

@@ -1,22 +1,25 @@
-For the system with state variables:\begin{equation}
-x = 
-\begin{bmatrix}
-x\\
-\dot x\\
+For the system with state matrix:
+\begin{equation}
+x = \begin{bmatrix}
+y\\
+\dot y\\
 \theta\\
 \dot \theta\\
-\end{bmatrix}\end{equation}The state space representation is: \begin{equation}
+\end{bmatrix}
+\end{equation}
+The following system is described:
+\begin{equation}
 \dot x = \begin{bmatrix}
 0&1&0&0\\
-0&-\sigma_2&g&-\alpha_1\\
+\frac{-mg}{M}&0&0&0\\
 0&0&0&1\\
-0&-\sigma_1&0&-\alpha_1\\
+0&0&\frac g l + \frac {gm} {Ml}&0\\
 \end{bmatrix}
 x + \begin{bmatrix}
 0\\
-g\\
+\frac 1 M\\
 0\\
-n\\
+-\frac 1 {m*l}\\
 \end{bmatrix}
 u
 \end{equation}

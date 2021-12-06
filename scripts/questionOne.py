@@ -67,10 +67,6 @@ def one_c(config: json) -> bool:
     print("Dont know how to solve C")
     return True
 
-def one_c(config: json) -> bool:
-    system = createSystem(config)
-    
-    return True
 
 def output_results_a(outfile: str,
                      system: Tuple[np.matrix]):

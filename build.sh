@@ -11,9 +11,10 @@ cd scripts
 
 python3 questionOne.py
 python3 questionTwo.py
+python3 questionThree.py
 
 cd ..
 
-bazel build ee510final
-# pdflatex Final.tex
-# pdflatex Final.tex
+# bazel build ee510final
+pdflatex Final.tex
+pdflatex Final.tex

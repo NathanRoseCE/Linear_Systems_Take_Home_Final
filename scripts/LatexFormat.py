@@ -15,7 +15,7 @@ def matrix_List(vals: List, latexMatrixType: str) -> str:
             latexMatrixString += str(column)
             if not i == len(row)-1:
                 latexMatrixString += r"&"
-        latexMatrixString += r"\\"
+        latexMatrixString += r"\\" + os.linesep
     latexMatrixString += r"\end{" + latexMatrixType + r"}" + os.linesep
     return latexMatrixString
 

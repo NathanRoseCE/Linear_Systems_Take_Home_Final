@@ -20,6 +20,10 @@
     "x_e_0": [[1.0],
 	      [-1.0],
 	      [1.0]],
+    "tex_one_fragment": "results/two_one.tex",
+    "tex_two_fragment": "results/two_two.tex",
+    "one_graph": "results/two_one_output.png",
+    "two_graph": "results/two_two_output.png",
     "dt": 0.01,
     "stopTime": 20,
     "kMax": 50,
@@ -38,7 +42,7 @@
 	}
     ],
     "L": [[0,   1],
-	  [0.5, 0  ],
+	  [0.1, 0  ],
 	  [0.1,   0.25]
     ]
 }
