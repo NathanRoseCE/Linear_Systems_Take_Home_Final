@@ -143,8 +143,6 @@ def dominantPoles(settlingTime: float,
     given a set of specifications, overshootPercent should be in 0->1 range
     """
     zeta, omega_n = dampingValues(settlingTime, settlingCriterion, overshootPerct)
-    print(zeta)
-    print(omega_n)
     imaginary = omega_n * math.sqrt(1 - (zeta**2))
     real = -zeta * omega_n
     roots = [{
@@ -177,8 +175,11 @@ def dampingValues(settlingTime: float,
     system given a set of specifications overshoot percentage should be in
     0 -> 1 range
     """
-    zeta = math.pow((math.pi/(math.log(overshootPercent)))**2 + 1, -0.5)
+    zeta = math.pow(((math.pi/(math.log(overshootPercent)))**2) + 1, -0.5)
     naturalFreq = 4/(zeta*settlingTime)
+    print(overshootPercent)
+    print(zeta)
+    print(naturalFreq)
     return zeta, naturalFreq
 
 
