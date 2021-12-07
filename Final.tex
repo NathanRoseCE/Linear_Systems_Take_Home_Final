@@ -16,24 +16,12 @@
 \author{Nathan Rose}
 \date{\today}
 
-\newcommand\question[5]{
-  
+\newcommand\question[4]{
   \textbf{\Large{#1 (#2)\\}}
   \large{#3\phantom{.}}\\
   work:
-  #4\phantom{.}
-
-  \finalAnswer{#5}\phantom{.}
+  #4\phantom{.}\\
 }
-
-\newcommand\finalAnswer[1]{
-  \large{
-  Final Answer:
-  
-  #1
-  }  
-}
-
 \newcommand{\TODO}[1]{{\LARGE \color{red} TODO: #1}}
 \newcommand\laplace[1]{\mathscr{L}\{#1\}}
 \newcommand\laplaceinv[1]{\mathscr{L}^{-1}\{#1\}}

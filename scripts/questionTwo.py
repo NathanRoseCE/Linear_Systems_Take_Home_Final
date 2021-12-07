@@ -11,7 +11,7 @@ from Utilities import F, gen_inputs, graph_results
 TWO_CONFIG_FILE = "resources/two.json"
 
 
-def main() -> bool:
+def main(results: List[bool], index: int) -> None:
     config = {}
     with open(TWO_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
@@ -20,7 +20,8 @@ def main() -> bool:
         os.mkdir("results")
     success = part_one(system, config)
     success &= part_two(system, config)
-    return success
+    results[index] = success
+    print("two success: " + str(results[index]))
 
 
 def createSystem(config: json) -> Tuple[np.matrix]:
@@ -95,7 +96,6 @@ def validResultsOne(config: json, k: np.matrix, outputs: np.matrix, times: List[
         if np.any(np.matrix(output) > config["out_limit"]["start"]):
             print("Value outside acceptable range")
             return False
-    print("all results valid")
     return True
 
 
@@ -107,7 +107,6 @@ def validResultsTwo(config: json, L: np.matrix, outputs: np.matrix, times: List[
         print("L matrix has values that are to large:")
         print("L = " + str(L))
         return False
-    print("all results valid")
     return True
 
 
@@ -158,5 +157,7 @@ def output_results_two(config: json,
 
 
 if __name__ == '__main__':
-    if not main():
+    result = [False]
+    main(result, 0)
+    if not result[0]:
         exit(1)

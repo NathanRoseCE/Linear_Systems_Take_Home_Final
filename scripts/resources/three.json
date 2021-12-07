@@ -44,7 +44,7 @@
 	[10, 20, 30, 40]
     ],
     "threads": 16,
-    "stopTime": 10,
+    "stopTime": 5,
     "threshold": 0.01,
     "dt": 0.001
 }

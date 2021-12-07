@@ -3,16 +3,17 @@ import LatexFormat
 import control
 import json
 import os
-from typing import Tuple
+from typing import Tuple, List
 
 ONE_CONFIG_FILE = "resources/one.json"
 
 
-def main() -> bool:
+def main(results: List[bool], index: int) -> None:
     config = {}
     with open(ONE_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
-    return one_a(config) and one_b(config)
+    results[index] = one_a(config) and one_b(config)
+    print("one success: " + str(results[index]))
 
 
 def createSystem(config: json, latex_string: bool = False):
@@ -105,5 +106,7 @@ def output_results_b(outfile: str,
 
 
 if __name__ == '__main__':
-    if not main():
+    result = [False]
+    main(result, 0)
+    if not result[0]:
         exit(1)

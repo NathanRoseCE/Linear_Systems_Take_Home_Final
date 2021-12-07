@@ -14,14 +14,15 @@ from NonLinearFragment import nonLinearUpdate, nonLinearOutput
 THREE_CONFIG_FILE = "resources/three.json"
 
 
-def main() -> bool:
+def main(results: List[bool], index: int) -> None:
     config = {}
     with open(THREE_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
-    return (three_one(config) and
-            three_two(config) and
-            # three_three(config) and
-            three_four(config))
+    results[index] = (three_one(config) and
+                      three_two(config) and
+                      three_three(config) and
+                      three_four(config))
+    print("three success: " + str(results[index]))
             
 
 
@@ -301,5 +302,7 @@ def print_results_four(config: json):
         ])
 
 if __name__ == '__main__':
-    if not main():
+    result = [False]
+    main(result, 0)
+    if not result[0]:
         exit(1)

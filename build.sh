@@ -9,9 +9,7 @@ trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 cd scripts
 
-python3 questionOne.py
-python3 questionTwo.py
-python3 questionThree.py
+python3 Main.py
 
 cd ..
 
