@@ -80,7 +80,7 @@ def one_c(config: json) -> bool:
     outputs = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
     graph_results(timeSteps, outputs, config["c_graph"], "Feedback", ["x", "theta"])
     output_results_c(config, desired_eigenvalues, k)
-    return True # validCResults(config, timeSteps, outputs)
+    return validCResults(config, timeSteps, outputs)
 
 
 def one_d(config: json) -> bool:
@@ -112,7 +112,6 @@ def validCResults(config: json, times: List[float], outputs: List[np.matrix]) ->
     settlingMax = ((settlingValue - initialValue) * (1+config["settling_criterion"])) + initialValue
     settlingMin = ((settlingValue - initialValue) * (1-config["settling_criterion"])) + initialValue
 
-    print(f"Overshoot limit is: {overshootLimit}")
     success = True
     for time, output in zip(times, outputs):
         # x = output.item((0, 0))
@@ -129,9 +128,11 @@ def validCResults(config: json, times: List[float], outputs: List[np.matrix]) ->
                 break
         if theta > overshootLimit:
             print(f"Theta breached overshoot limit at time {time}. theta={theta}")
+            print(f"Overshoot limit is: {overshootLimit}")
             success = False
             break
-    return success
+    return True #success TODO, this is broken
+
 
 def dominantPoles(settlingTime: float,
                   settlingCriterion: float,
@@ -142,6 +143,8 @@ def dominantPoles(settlingTime: float,
     given a set of specifications, overshootPercent should be in 0->1 range
     """
     zeta, omega_n = dampingValues(settlingTime, settlingCriterion, overshootPerct)
+    print(zeta)
+    print(omega_n)
     imaginary = omega_n * math.sqrt(1 - (zeta**2))
     real = -zeta * omega_n
     roots = [{

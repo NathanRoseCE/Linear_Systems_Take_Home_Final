@@ -7,7 +7,7 @@
     "g": 9.8,
     "settling_time": 1.5,
     "settling_criterion": 0.02,
-    "overshoot": 0.01,
+    "overshoot": 0.001,
     "tex_a_fragment": "results/one_a.tex",
     "tex_b_fragment": "results/one_b.tex",
     "tex_c_fragment": "results/one_c.tex",
