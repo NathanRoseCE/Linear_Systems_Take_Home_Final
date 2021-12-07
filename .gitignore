@@ -7,3 +7,6 @@ auto/
 
 # compiled python
 *.pyc
+
+# minted stuff
+_minted*

@@ -30,12 +30,21 @@ def gen_inputs(stopTime: float, dt: float) -> Tuple[List[float]]:
             [timeStep for timeStep in np.arange(0, stopTime, dt)])
 
 
-def graph_results(timeSteps: List[float], outputs: np.matrix, save_file: str, title_name: str):
+def graph_results(timeSteps: List[float],
+                  outputs: np.matrix,
+                  save_file: str,
+                  title_name: str,
+                  output_names: List[str] = None):
     fig = plt.figure()
     axis = fig.add_axes([0.1, 0.1, 0.75, 0.75])
     outputs = np.concatenate(outputs, axis=1)
-    for i, output in enumerate(outputs):
-        axis.plot(timeSteps, output.T, label=f"output {i}")
+    if output_names is None:
+        output_names = []
+        for i in range(len(outputs)):
+            output_names.append(f"output {i}")
+
+    for output, name in zip(outputs, output_names):
+        axis.plot(timeSteps, output.T, label=name)
     axis.set_title(title_name)
     axis.set_xlabel('Time(s)')
     axis.set_ylabel('System outputs')

@@ -6,12 +6,16 @@ from typing import List, Tuple
 ROUND_TO = 3
 
 
+def round_float(val: float) -> str:
+    return str(round(val, ROUND_TO))
+
+
 def matrix_List(vals: List, latexMatrixType: str) -> str:
     latexMatrixString = r"\begin{" + latexMatrixType + r"}" + os.linesep
     for row in vals:
         for i, column in enumerate(row):
             if type(column) == float:
-                column = round(column, ROUND_TO)
+                column = round_float(column)
             latexMatrixString += str(column)
             if not i == len(row)-1:
                 latexMatrixString += r"&"
@@ -63,7 +67,7 @@ def frac(var: str, numerator: List[float], denominator: List[float]) -> str:
 def polynomial(var: str, coefficents: List[float]) -> str:
     poly_str = ""
     for i, num in enumerate(coefficents):
-        rounded = round(num, ROUND_TO)
+        rounded = float(round_float(num))
         if rounded != 0:
             sign = ""
             if not i == 0:

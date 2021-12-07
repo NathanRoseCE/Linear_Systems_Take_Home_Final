@@ -3,11 +3,13 @@ import numpy as np
 import LatexFormat
 import os
 import Model
-from typing import Tuple
+from typing import Tuple, List
 from Utilities import F, gen_inputs, graph_results
 from control import lyap
 from numpy.linalg import inv
-from math import sin, cos, pi
+from math import sin, cos, pi, degrees
+from threading import Thread
+from NonLinearFragment import nonLinearUpdate, nonLinearOutput
 
 THREE_CONFIG_FILE = "resources/three.json"
 
@@ -16,7 +18,11 @@ def main() -> bool:
     config = {}
     with open(THREE_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
-    return three_one(config) and three_two(config) and three_three(config)
+    return (three_one(config) and
+            three_two(config) and
+            # three_three(config) and
+            three_four(config))
+            
 
 
 def three_one(config: json) -> bool:
@@ -35,7 +41,7 @@ def three_two(config: json) -> bool:
     x_0 = config["two_initial"]
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     outputs = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
-    graph_results(timeSteps, outputs, config["two_graph"], "3-2")
+    graph_results(timeSteps, outputs, config["two_graph"], "3-2", ["Y", "Theta"])
     print_results_two(config, system, f, K0, k)
     return True
 
@@ -49,7 +55,6 @@ def three_three(config: json) -> bool:
     k = K0 * inv(T)
     x_0 = np.matrix(config["three_sample_x0"])
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
-    print(k)
     outputs = Model.ModelSystem(nonLinearUpdate,
                                 nonLinearOutput,
                                 x_0,
@@ -57,94 +62,106 @@ def three_three(config: json) -> bool:
                                 k,
                                 config,
                                 config["dt"])
-    print("model complet")
-    graph_results(timeSteps, outputs, config["three_graph"], "Nonlinear with feedback sample")
-    print("graphed")
-    print_results_three(config, x_0, 4.0)
-    print("output")
+    graph_results(timeSteps, outputs, config["three_graph"], "Nonlinear feedback sample", ["theta"])
+    thetaLimit = theta_limit(config, k)
+    print_results_three(config, x_0, thetaLimit)
+    results = [True, False]
+    thetaStable(0, config, k, results, 0) and not thetaStable(3, config, k, results, 1)
+    return results[0] and not results[1]
+
+def three_four(config: json) -> bool:
+    system = createSystem(config, onlyTheta=True)
+    A, B, C, D = system
+    k = feedback(system, config)
+    x_0 = np.matrix(config["four_x0"])
+    inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
+    nonlin_out = Model.ModelSystem(nonLinearUpdate,
+                                   nonLinearOutput,
+                                   x_0,
+                                   inputs,
+                                   k,
+                                   config,
+                                   config["dt"])
+    lin_out = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
+    outs = []
+    zipped = zip(nonlin_out, lin_out)
+    for nonLinear, linear in zipped:
+        outs.append(
+            np.matrix([
+                [nonLinear.item((0,0))],
+                [linear.item((0,0))]
+            ])
+        )
+    graph_results(timeSteps, outs, config["four_graph"], "Comparison", ["non-linear", "linear"])
+    print_results_four(config)
     return True
 
 
-def thetaStable(theta, config: json, k: np.matrix) -> bool:
+def feedback(system: Tuple[np.matrix], config: json) -> np.matrix:
+    A, B, C, D = system
+    f = F(config["desired_eig"], A.shape)
+    K0 = np.matrix(config["K0"])
+    T = lyap(A, -f, -B*K0)
+    K0 = np.matrix(K0)
+    T = lyap(A, -f, -B*K0)
+    return K0 * inv(T)
+
+
+def theta_limit(config: json, k: np.matrix, minTheta: float = 0, maxTheta: float = pi) -> float:
     """ 
-    This function is used to determine if the system is stable at a given theta
+    This is a function that will find the stable limit for theta, assumes the min is stable
+    and the max is not
     """
-    pass
+    if abs(maxTheta - minTheta) < 10**-(LatexFormat.ROUND_TO):
+        return maxTheta
+    numThreads = int(config["threads"])
+    
+    thetas = np.arange(minTheta, maxTheta, (maxTheta-minTheta)/numThreads)
+    threads = [None] * numThreads
+    results = [None] * numThreads
+    for i in range(numThreads):
+        threads[i] = Thread(target=thetaStable, args=(thetas[i], config, k, results, i))
+        threads[i].start()
+
+    for i in range(numThreads):
+        threads[i].join()
+
+    i = 0
+    while results[i]:
+        i = i + 1
+    return theta_limit(config, k, thetas[i-1], thetas[i])
 
 
-def nonLinearUpdate(x: np.matrix, r: np.matrix, k: np.matrix, config: json, dt: float) -> np.matrix:
-    y = x.item((0, 0))
-    dot_y = x.item((1, 0))
-    theta = x.item((2, 0))
-    dot_theta = x.item((3, 0))
-    u = r - (k*x)
-    n = u.item((0, 0))
-    M = float(config["M"])
-    m = float(config["m"])
-    L = float(config["l"])
-    g = float(config["g"])
-
-    # non-linear model
-    accels = inv(np.matrix([
-        [M+m, m*L],
-        [1, L]
-    ])) * np.matrix([
-        [n],
-        [g*theta]
+def thetaStable(theta: float, config: json, k: np.matrix, result: List[bool], index: int) -> None:
+    """ 
+    This function is used to determine if the system is stable at a given theta,
+    stores the result in bool
+    """
+    x_0 = np.matrix([
+        [0],
+        [0],
+        [theta],
+        [0]
     ])
-
-    ddot_y = accels.item((0, 0))
-    ddot_theta = accels.item((1, 0))
-    # ddot_y = (n/M) - (m*g*y/M)
-    # temp_one = ((g/L) + (g*m/(M*L)))
-    # temp_two = -1.0/(M*L)
-    # ddot_theta = theta*temp_one + n*temp_two
-    # dx = np.matrix([
-    #     [dot_y],
-    #     [ddot_y],
-    #     [dot_theta],
-    #     [ddot_theta]
-    # ])
-    A, B, C, D = createSystem(config)
-    dx = A*x + B*n
-    # print("y: 0 vs " + str(A.item((3, 0))))
-    # print("doty: 0 vs " + str(A.item((3, 1))))
-    # print("theta:" + str(temp_one) + " vs " + str(A.item((3, 2))))
-    # print("dottheta: 0 vs " + str(A.item((3, 3))))
-    # print("n: " + str(temp_two) + " vs " + str(B.item((3, 0))))
-    # print("matrix: " + str(dx.item((3, 0))))
-    # print("manual: " + str(ddot_theta))
-    dx.itemset((0, 0), dot_y)
-    dx.itemset((1, 0), ddot_y)
-    dx.itemset((2, 0), dot_theta)
-    dx.itemset((3, 0), ddot_theta)
-    next_x = x + (dx*dt)
-
-    # ensure theta is in range -pi -> pi
-    next_theta = next_x.item((2, 0))
-    while (next_theta) > pi:
-        raise "collapsed"
-        next_theta = next_theta - (2*pi)
-    while (next_theta) < -pi:
-        raise "collapsed"
-        next_theta = next_theta + (2*pi)
-    next_x.itemset((2, 0), next_theta)
-
-    return next_x
+    inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
+    try:
+        outputs = Model.ModelSystem(nonLinearUpdate,
+                                    nonLinearOutput,
+                                    x_0,
+                                    inputs,
+                                    k,
+                                    config,
+                                    config["dt"])
+        if outputs[-1].item((0, 0)) < config["threshold"]:
+            result[index] = True
+        else:
+            result[index] = False
+    except AssertionError:
+        result[index] = False
 
 
-def nonLinearOutput(x: np.matrix, r: np.matrix, k: np.matrix, config: json, dt: float) -> np.matrix:
-    y = x.item((0, 0))
-    dot_y = x.item((1, 0))
-    theta = x.item((2, 0))
-    dot_theta = x.item((3, 0))
-    return np.matrix([
-        [y],
-        [theta]
-    ])
 
-
-def createSystem(config: json, latex_string: bool = False):
+def createSystem(config: json, latex_string: bool = False, onlyTheta: bool=False):
     if not latex_string:
         M = config["M"]
         m = config["m"]
@@ -162,14 +179,24 @@ def createSystem(config: json, latex_string: bool = False):
             [0],
             [-1/(M*L)]
         ])
-        C = np.matrix([
-            [1, 0, 0, 0],
-            [0, 0, 1, 0]
-        ])
-        D = np.matrix([
-             [0],
-             [0]
-        ])
+        C = []
+        D = []
+        if onlyTheta:
+            C = np.matrix([
+                [0, 0, 1, 0]
+            ])
+            D = np.matrix([
+                [0]
+            ])
+        else:
+            C = np.matrix([
+                [1, 0, 0, 0],
+                [0, 0, 1, 0]
+            ])
+            D = np.matrix([
+                [0],
+                [0]
+            ])
     else:
         A = [
             [0, 1, 0, 0],
@@ -183,14 +210,22 @@ def createSystem(config: json, latex_string: bool = False):
             [0],
             [r"-\frac 1 {m*l}"]
         ]
-        C = [
-            [1, 0, 0, 0],
-            [0, 0, 1, 0]
-        ]
-        D = [
-            [0],
-            [0]
-        ]
+        if onlyTheta:
+            C = [
+                [0, 0, 1, 0]
+            ]
+            D = [
+                [0]
+            ]
+        else:
+            C = [
+                [1, 0, 0, 0],
+                [0, 0, 1, 0]
+            ]
+            D = [
+                [0],
+                [0]
+            ]
     return A, B, C, D
 
 
@@ -237,16 +272,32 @@ def print_results_two(config: json,
 def print_results_three(config: json,
                         x0Sample: np.matrix,
                         theta_limit: float):
+    code_str = ""
+    with open("NonLinearFragment.py") as file:
+        code_str = file.read()
     with open(config["tex_three_fragment"], 'w') as out:
         out.writelines([
             "The non-linear system was implimented with the following code" + os.linesep,
-            r"\TODO{add code fragment}" + os.linesep,
+            r"\begin{minted}{python3}" + os.linesep,
+            code_str,
+            r"\end{minted}" + os.linesep,
             "A sample with starting inputs of: $" +
             LatexFormat.bmatrix(x0Sample) + "$ produces the followung outputs" + os.linesep,
             r"\image{" + config["three_graph"].split('/')[1] + r"}{3-3 system}{fig:3-3}" + os.linesep,
             "For the limit, the system was considered stabalized if after " + str(config["stopTime"]),
             r" seconds the system state variable $\theta$ was within $\pm" + str(config["threshold"]),
-            "$ and the result of this is a theta limit of: " + str(theta_limit) + os.linesep
+            "$ of 0, and it had not fallen over it yet",
+            ", the result of this is a theta limit of: " + LatexFormat.round_float(theta_limit),
+            " radians which is: " + LatexFormat.round_float(degrees(theta_limit)) + " degrees" + os.linesep
+        ])
+
+
+def print_results_four(config: json):
+    with open(config["tex_four_fragment"], 'w') as out:
+        out.writelines([
+            "The comparison betweeen the linear and nonlinear system can be seen" + os.linesep,
+            r"in the system below in \autoref{fig:comparison}" + os.linesep,
+            r"\image{" + config["four_graph"].split('/')[1] + r"}{Comparison}{fig:comparison}" + os.linesep
         ])
 
 if __name__ == '__main__':

@@ -16,5 +16,5 @@ python3 questionThree.py
 cd ..
 
 # bazel build ee510final
-pdflatex Final.tex
-pdflatex Final.tex
+pdflatex -shell-escape Final.tex
+pdflatex -shell-escape Final.tex

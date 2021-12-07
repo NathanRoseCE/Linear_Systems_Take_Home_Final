@@ -1,5 +1,3 @@
-The non-linear system was implimented with the following code
-\begin{minted}{python3}
 import numpy as np
 from numpy.linalg import inv
 from math import cos, sin, pi
@@ -54,13 +52,3 @@ def nonLinearOutput(x: np.matrix, r: np.matrix, k: np.matrix, config: json, dt: 
     return np.matrix([
         [theta]
     ])
-\end{minted}
-A sample with starting inputs of: $\begin{bmatrix}
-0\\
-0\\
-1\\
-0\\
-\end{bmatrix}
-$ produces the followung outputs
-\image{three_three.png}{3-3 system}{fig:3-3}
-For the limit, the system was considered stabalized if after 10 seconds the system state variable $\theta$ was within $\pm0.01$ of 0, and it had not fallen over it yet, the result of this is a theta limit of: 1.058 radians which is: 60.645 degrees

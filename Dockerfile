@@ -30,7 +30,8 @@ RUN apt install -y python3-dev \
 RUN python3 -m pip install numpy \
     	       	   	   control \
 			   typing \
-			   slycot
+			   slycot \
+			   pygments
 
 # Build images
 CMD ["/bin/bash", "./build.sh"]
