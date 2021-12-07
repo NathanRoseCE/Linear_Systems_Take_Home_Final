@@ -1,13 +1,17 @@
 import numpy as np
 import os
 from control import tf
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 ROUND_TO = 3
 
 
 def round_float(val: float) -> str:
     return str(round(val, ROUND_TO))
+
+
+def imaginary(val: Dict[str, float]) -> str:
+    return round_float(val["real"]) + r" \pm " + round_float(val["imaginary"]) + "j"
 
 
 def matrix_List(vals: List, latexMatrixType: str) -> str:

@@ -90,7 +90,7 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
         y = _linearOutput(x, u, (A, B, C, D), dt)
         # estimator step
         dot_x_e = (A*x_e) + (B*u) + L*(y-y_e)
-        x_e += dot_x_e*dt
+        x_e = x_e + (dot_x_e*dt)
         y_e = (C*x_e) + D
         outputs.append(y)
     return outputs

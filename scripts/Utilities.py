@@ -1,6 +1,8 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import numpy as np
 import matplotlib.pyplot as plt
+from control import lyap
+from numpy.linalg import inv
 
 
 def F(desiredEigens: List[dict], shape):
@@ -50,3 +52,20 @@ def graph_results(timeSteps: List[float],
     axis.set_ylabel('System outputs')
     axis.legend()
     fig.savefig(save_file)
+
+
+def feedback(system: Tuple[np.matrix], desiredEig: Dict[str, float], K0: np.matrix) -> np.matrix:
+    A, B, C, D = system
+    f = F(desiredEig, A.shape)
+    T = lyap(A, -f, -B*K0)
+    K0 = np.matrix(K0)
+    T = lyap(A, -f, -B*K0)
+    return K0 * inv(T)
+
+
+def observer(system: Tuple[np.matrix], desiredEig: Dict[str, float], L0: np.matrix) -> np.matrix:
+    A, B, C, D = system
+    f = F(desiredEig, A.shape)
+    T = lyap(-f, A, -L0*C)
+    return np.linalg.inv(T)*L0
+    

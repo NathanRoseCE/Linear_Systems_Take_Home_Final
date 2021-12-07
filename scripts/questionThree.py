@@ -3,8 +3,8 @@ import numpy as np
 import LatexFormat
 import os
 import Model
-from typing import Tuple, List
-from Utilities import F, gen_inputs, graph_results
+from typing import Tuple, List, Dict
+from Utilities import F, gen_inputs, graph_results, feedback
 from control import lyap
 from numpy.linalg import inv
 from math import sin, cos, pi, degrees
@@ -23,7 +23,6 @@ def main(results: List[bool], index: int) -> None:
                       three_three(config) and
                       three_four(config))
     print("three success: " + str(results[index]))
-            
 
 
 def three_one(config: json) -> bool:
@@ -70,10 +69,11 @@ def three_three(config: json) -> bool:
     thetaStable(0, config, k, results, 0) and not thetaStable(3, config, k, results, 1)
     return results[0] and not results[1]
 
+
 def three_four(config: json) -> bool:
     system = createSystem(config, onlyTheta=True)
     A, B, C, D = system
-    k = feedback(system, config)
+    k = feedback(system, config["desired_eig"], np.matrix(config["K0"]))
     x_0 = np.matrix(config["four_x0"])
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     nonlin_out = Model.ModelSystem(nonLinearUpdate,
@@ -98,16 +98,6 @@ def three_four(config: json) -> bool:
     return True
 
 
-def feedback(system: Tuple[np.matrix], config: json) -> np.matrix:
-    A, B, C, D = system
-    f = F(config["desired_eig"], A.shape)
-    K0 = np.matrix(config["K0"])
-    T = lyap(A, -f, -B*K0)
-    K0 = np.matrix(K0)
-    T = lyap(A, -f, -B*K0)
-    return K0 * inv(T)
-
-
 def theta_limit(config: json, k: np.matrix, minTheta: float = 0, maxTheta: float = pi) -> float:
     """ 
     This is a function that will find the stable limit for theta, assumes the min is stable
@@ -116,7 +106,7 @@ def theta_limit(config: json, k: np.matrix, minTheta: float = 0, maxTheta: float
     if abs(maxTheta - minTheta) < 10**-(LatexFormat.ROUND_TO):
         return maxTheta
     numThreads = int(config["threads"])
-    
+
     thetas = np.arange(minTheta, maxTheta, (maxTheta-minTheta)/numThreads)
     threads = [None] * numThreads
     results = [None] * numThreads
@@ -159,7 +149,6 @@ def thetaStable(theta: float, config: json, k: np.matrix, result: List[bool], in
             result[index] = False
     except AssertionError:
         result[index] = False
-
 
 
 def createSystem(config: json, latex_string: bool = False, onlyTheta: bool=False):
@@ -300,6 +289,7 @@ def print_results_four(config: json):
             r"in the system below in \autoref{fig:comparison}" + os.linesep,
             r"\image{" + config["four_graph"].split('/')[1] + r"}{Comparison}{fig:comparison}" + os.linesep
         ])
+
 
 if __name__ == '__main__':
     result = [False]

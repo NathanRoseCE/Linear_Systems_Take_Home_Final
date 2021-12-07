@@ -6,7 +6,7 @@ from control import lqr
 from control import lyap
 import json
 from typing import List, Tuple
-from Utilities import F, gen_inputs, graph_results
+from Utilities import F, gen_inputs, graph_results, observer
 
 TWO_CONFIG_FILE = "resources/two.json"
 
@@ -65,6 +65,7 @@ def part_two(system: Tuple[np.matrix], config: json) -> bool:
     f = F(config["desired_eigenvalues"], A.shape)
     T = lyap(-f, A, -L0*C)
     L = np.linalg.inv(T)*L0
+    L = observer(system, config["desired_eigenvalues"], L0)
     system_dynamics = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, 0.01, inputs)
     success = validResultsTwo(config, L, system_dynamics, timeSteps)
     graph_results(timeSteps, system_dynamics, config["two_graph"], 'Question 2-2')
