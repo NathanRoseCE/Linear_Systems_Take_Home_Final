@@ -11,7 +11,7 @@ trap 'echo "\"${last_command}\" failed: command filed with exit code $?."' EXIT
 if [ "$quietmode" = true ] ; then
     echo "Building Artifacts, this may take a second"
     cd scripts
-    python3 Main.py > /dev/null 2>&1
+    make
     cd ..
     echo "Building PDF"
     pdflatex -shell-escape Final.tex > /dev/null 2>&1

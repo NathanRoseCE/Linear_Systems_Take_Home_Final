@@ -80,7 +80,7 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
     x_e = deepcopy(x_e_0)
     y_e = np.zeros((C.shape[0], 1))
     k = np.matrix(k)
-    # A_est = A - L*C
+    A_est = A - L*C
     for r in inputs:
         # feedback step
         u = r - (k*x_e)
@@ -89,7 +89,7 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
         x = _linearUpdate(x, u, (A, B, C, D), dt)
         y = _linearOutput(x, u, (A, B, C, D), dt)
         # estimator step
-        dot_x_e = (A*x_e) + (B*u) + L*(y-y_e)
+        dot_x_e = (A_est*x_e) + (B*r) + L*y
         x_e = x_e + (dot_x_e*dt)
         y_e = (C*x_e) + D
         outputs.append(y)

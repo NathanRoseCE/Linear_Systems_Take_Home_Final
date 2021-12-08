@@ -4,10 +4,14 @@ from math import cos, sin, pi
 import json
 
 
-def nonLinearUpdate(x: np.matrix, r: np.matrix, k: np.matrix, config: json, dt: float) -> np.matrix:
+def nonLinearUpdate(x: np.matrix,
+                    r: np.matrix,
+                    k: np.matrix,
+                    config: json,
+                    dt: float) -> np.matrix:
     """
-    This function is used to model the non-linear system, this will throw an exception if
-    there is a rollover
+    This function is used to model the non-linear system, this will throw an
+    exception if there is a rollover
     """
     # a list of variables that make my life easier
     dot_y = x.item((1, 0))
@@ -20,7 +24,7 @@ def nonLinearUpdate(x: np.matrix, r: np.matrix, k: np.matrix, config: json, dt: 
     L = float(config["l"])
     g = float(config["g"])
 
-    # non-linear functions
+    # non linear update code
     accels = inv(np.matrix([
         [M+m, m*L*cos(theta)],
         [cos(theta), L]
