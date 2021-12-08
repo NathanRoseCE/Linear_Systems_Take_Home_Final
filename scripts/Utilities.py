@@ -38,7 +38,7 @@ def graph_results(timeSteps: List[float],
                   title_name: str,
                   output_names: List[str] = None):
     fig = plt.figure()
-    axis = fig.add_axes([0.1, 0.1, 0.75, 0.75])
+    axis = fig.add_axes([0.15, 0.15, 0.75, 0.75])
     outputs = np.concatenate(outputs, axis=1)
     if output_names is None:
         output_names = []

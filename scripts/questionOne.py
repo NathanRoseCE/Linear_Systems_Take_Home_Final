@@ -101,7 +101,7 @@ def one_d(config: json) -> bool:
     L = observer(system, observerEig, L0)
     outputs = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, config["dt"], inputs)
     graph_results(timeSteps, outputs, config["d_graph"], "Feedback with Observer", ["x", "theta"])
-    output_results_d(config, observerEig, L0, L)
+    output_results_d(config, observerEig, L0, L, x_e_0)
     return True
 
 
@@ -240,7 +240,8 @@ def output_results_c(config: json,
 def output_results_d(config: json,
                      obseigs: List[Dict[str, float]],
                      l0: np.matrix,
-                     L: np.matrix):
+                     L: np.matrix,
+                     x_e_0: np.matrix):
     with open(config["tex_d_fragment"], 'w') as out:
         out.writelines([
             "The observer was chosen to have eigenvalues " + LatexFormat.round_float(config["observerScale"]),
@@ -254,6 +255,7 @@ def output_results_d(config: json,
             "L = " + LatexFormat.bmatrix(L),
             r"\end{equation}",
             r"this produced a response which can be seen below in \autoref{fig:observer}" + os.linesep,
+            r"assuming a $x_{e0} = " + LatexFormat.bmatrix(x_e_0) + "$:" + os.linesep,
             r"\image{" + config["d_graph"].split('/')[1] + r"}{Observer}{fig:observer}" + os.linesep
         ])
 

@@ -3,12 +3,12 @@ import numpy as np
 import LatexFormat
 import os
 import Model
-from typing import Tuple, List, Dict
+from typing import Tuple, List
 from Utilities import F, gen_inputs, graph_results, feedback
 from control import lyap
 from numpy.linalg import inv
-from math import sin, cos, pi, degrees
-from threading import Thread
+from math import pi, degrees
+from multiprocessing import Process, Array
 from NonLinearFragment import nonLinearUpdate, nonLinearOutput
 
 THREE_CONFIG_FILE = "scripts/resources/three.json"
@@ -65,9 +65,7 @@ def three_three(config: json) -> bool:
     graph_results(timeSteps, outputs, config["three_graph"], "Nonlinear feedback sample", ["theta"])
     thetaLimit = theta_limit(config, k)
     print_results_three(config, x_0, thetaLimit)
-    results = [True, False]
-    thetaStable(0, config, k, results, 0) and not thetaStable(3, config, k, results, 1)
-    return results[0] and not results[1]
+    return True
 
 
 def three_four(config: json) -> bool:
@@ -89,8 +87,8 @@ def three_four(config: json) -> bool:
     for nonLinear, linear in zipped:
         outs.append(
             np.matrix([
-                [nonLinear.item((0,0))],
-                [linear.item((0,0))]
+                [nonLinear.item((0, 0))],
+                [linear.item((0, 0))]
             ])
         )
     graph_results(timeSteps, outs, config["four_graph"], "Comparison", ["non-linear", "linear"])
@@ -109,9 +107,9 @@ def theta_limit(config: json, k: np.matrix, minTheta: float = 0, maxTheta: float
 
     thetas = np.arange(minTheta, maxTheta, (maxTheta-minTheta)/numThreads)
     threads = [None] * numThreads
-    results = [None] * numThreads
+    results = Array('b', [False for i in range(numThreads)])
     for i in range(numThreads):
-        threads[i] = Thread(target=thetaStable, args=(thetas[i], config, k, results, i))
+        threads[i] = Process(target=thetaStable, args=(thetas[i], config, k, results, i))
         threads[i].start()
 
     for i in range(numThreads):

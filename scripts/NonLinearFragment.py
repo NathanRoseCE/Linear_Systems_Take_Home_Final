@@ -10,8 +10,9 @@ def nonLinearUpdate(x: np.matrix,
                     config: json,
                     dt: float) -> np.matrix:
     """
-    This function is used to model the non-linear system, this will throw an
-    exception if there is a rollover
+    This function is used to model the non-linear system described in
+    question 3. If the pendulum falls over, will throw a validation
+    error, to indicate the system fails
     """
     # a list of variables that make my life easier
     dot_y = x.item((1, 0))

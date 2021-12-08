@@ -7,7 +7,7 @@ latex = pdflatex -shell-escape
 
 all : results/question-one results/question-two results/question-three Final.pdf
 
-results/question-one : scripts/questionOne.py scripts/NonLinearFragment.py scripts/resources/one.json $(Utilities) 
+results/question-one : scripts/questionOne.py scripts/resources/one.json $(Utilities) 
 	$(py) scripts/questionOne.py
 	touch results/question-one
 
@@ -15,7 +15,7 @@ results/question-two : scripts/questionTwo.py scripts/resources/two.json $(Utili
 	$(py) scripts/questionTwo.py
 	touch results/question-two
 
-results/question-three : scripts/questionThree.py scripts/resources/three.json $(Utilities)
+results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py scripts/resources/three.json $(Utilities)
 	$(py) scripts/questionThree.py
 	touch results/question-three
 
