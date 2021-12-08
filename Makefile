@@ -19,9 +19,12 @@ results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py s
 	$(py) scripts/questionThree.py
 	touch results/question-three
 
-Final.pdf : results/question-one results/question-two results/question-three ./*.tex
+Final.pdf : results/question-one results/question-two results/question-three $(./*.tex)
 	$(latex) Final.tex
 
 clean :
 	rm -rf results/*
 	rm -rf __cache__/
+	rm -f *.log
+	rm -f *.out
+	rm -f *.aux

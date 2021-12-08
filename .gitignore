@@ -10,3 +10,7 @@ auto/
 
 # minted stuff
 _minted*
+
+
+# results
+results/
