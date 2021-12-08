@@ -11,7 +11,7 @@ from math import sin, cos, pi, degrees
 from threading import Thread
 from NonLinearFragment import nonLinearUpdate, nonLinearOutput
 
-THREE_CONFIG_FILE = "resources/three.json"
+THREE_CONFIG_FILE = "scripts/resources/three.json"
 
 
 def main(results: List[bool], index: int) -> None:
@@ -263,7 +263,7 @@ def print_results_three(config: json,
                         x0Sample: np.matrix,
                         theta_limit: float):
     code_str = ""
-    with open("NonLinearFragment.py") as file:
+    with open("scripts/NonLinearFragment.py") as file:
         code_str = file.read()
     with open(config["tex_three_fragment"], 'w') as out:
         out.writelines([

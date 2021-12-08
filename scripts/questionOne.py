@@ -8,7 +8,7 @@ from Utilities import feedback, gen_inputs, graph_results, observer
 import Model
 import math
 
-ONE_CONFIG_FILE = "resources/one.json"
+ONE_CONFIG_FILE = "scripts/resources/one.json"
 
 
 def main(results: List[bool], index: int) -> None:

@@ -8,7 +8,7 @@ import json
 from typing import List, Tuple
 from Utilities import F, gen_inputs, graph_results, observer
 
-TWO_CONFIG_FILE = "resources/two.json"
+TWO_CONFIG_FILE = "scripts/resources/two.json"
 
 
 def main(results: List[bool], index: int) -> None:
