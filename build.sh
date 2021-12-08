@@ -11,7 +11,7 @@ trap 'echo "\"${last_command}\" failed: command filed with exit code $?."' EXIT
 if [ "$quietmode" = true ] ; then
     echo "Building Artifacts, this may take a second"
     cd scripts
-    make
+    make  > /dev/null 2>&1
     cd ..
     echo "Building PDF"
     pdflatex -shell-escape Final.tex > /dev/null 2>&1
