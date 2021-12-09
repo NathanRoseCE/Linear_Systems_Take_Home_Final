@@ -1,19 +1,19 @@
-The observer was chosen to have eigenvalues that are observer VAR{ scale | round_float } further away than the
+The observer was chosen to have eigenvalues that are observer \PY{ scale | round_float } further away than the
 controller eigenvalues listed above in the previous step. This resulted in eigenvalues of:
 
 \begin{enumerate}
-BLOCK{ for eig in eigs }
-\item $ VAR{ eig | imaginary }$
-BLOCK{ endfor }
+\PYTHON{ for eig in eigs }
+\item $ \PY{ eig | imaginary }$
+\PYTHON{ endfor }
 \end{enumerate}
 
-The L matrix was determined from $L_0 = VAR{ l0 | bmatrix }$ which resulted in:
+The L matrix was determined from $L_0 = \PY{ l0 | bmatrix }$ which resulted in:
 
 \begin{equation}
-L = VAR{ L | bmatrix }
+L = \PY{ L | bmatrix }
 \end{equation}
 
 This produces a response which can be seen below in \autoref{fig:observer} below.
 
-\image{VAR{graph}}{Observer}{fig:observer}
+\image{\PY{graph}}{Observer}{fig:observer}
 

@@ -107,9 +107,9 @@ This is the private jinja environment that is used to render
 the templates
 """
 _latex_jinja_env = Environment(
-    block_start_string=r'\BLOCK{',
+    block_start_string=r'\PYTHON{',
     block_end_string='}',
-    variable_start_string=r'\VAR{',
+    variable_start_string=r'\PY{',
     variable_end_string='}',
     comment_start_string='#{',
     comment_end_string='}',

@@ -13,15 +13,12 @@ all : results/one.tex results/two.tex results/three.tex Final.pdf
 
 results/one.tex : scripts/questionOne.py resources/one.json $(Utilities) $(q_one_template)
 	$(py) scripts/questionOne.py
-	touch results/question-one
 
 results/two.tex : scripts/questionTwo.py resources/two.json $(Utilities) $(q_two_template)
 	$(py) scripts/questionTwo.py
-	touch results/question-two
 
 results/three.tex : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities) $(q_three_template)
 	$(py) scripts/questionThree.py
-	touch results/question-three
 
 #latex has to be run twice because its fun like that
 Final.pdf : results/one.tex results/two.tex results/three.tex $(texFiles)
