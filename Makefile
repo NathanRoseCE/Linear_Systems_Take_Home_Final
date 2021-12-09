@@ -2,24 +2,27 @@
 # so there are probably several bad practices in here :)
 
 Utilities = scripts/LatexFormat.py scripts/Model.py scripts/Utilities.py
+texFiles = ./content.tex ./functions.tex
 py = python3
 latex = pdflatex -shell-escape
 
 all : results/question-one results/question-two results/question-three Final.pdf
 
-results/question-one : scripts/questionOne.py scripts/resources/one.json $(Utilities) 
+results/question-one : scripts/questionOne.py resources/one.json $(Utilities) 
 	$(py) scripts/questionOne.py
 	touch results/question-one
 
-results/question-two : scripts/questionTwo.py scripts/resources/two.json $(Utilities)
+results/question-two : scripts/questionTwo.py resources/two.json $(Utilities)
 	$(py) scripts/questionTwo.py
 	touch results/question-two
 
-results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py scripts/resources/three.json $(Utilities)
+results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities)
 	$(py) scripts/questionThree.py
 	touch results/question-three
 
-Final.pdf : results/question-one results/question-two results/question-three $(./*.tex)
+#latex has to be run twice because its fun like that
+Final.pdf : results/question-one results/question-two results/question-three $(texFiles)
+	$(latex) Final.tex
 	$(latex) Final.tex
 
 clean :

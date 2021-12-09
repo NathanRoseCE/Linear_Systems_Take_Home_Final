@@ -8,7 +8,7 @@ import json
 from typing import List, Tuple
 from Utilities import F, gen_inputs, graph_results, observer
 
-TWO_CONFIG_FILE = "scripts/resources/two.json"
+TWO_CONFIG_FILE = "resources/two.json"
 
 
 def main(results: List[bool], index: int) -> None:
@@ -49,7 +49,7 @@ def part_one(system: Tuple[np.matrix], config: json) -> bool:
     success = validResultsOne(config, k, system_dynamics, timeSteps)
     graph_results(timeSteps, system_dynamics, config["one_graph"], 'Question 2-1')
     if success:
-        output_results_one(config, system, q, r)
+        output_results_one(config, system, q, r, k)
     return success
 
 
@@ -61,11 +61,14 @@ def part_two(system: Tuple[np.matrix], config: json) -> bool:
     x_0 = np.matrix(config["x_0"])
     x_e_0 = np.matrix(config["x_e_0"])
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
+
+    # redundant code to get intermediate values
     L0 = np.matrix(config["L"])
-    f = F(config["desired_eigenvalues"], A.shape)
+    f = F(config["desired_eigenvalues"])
     T = lyap(-f, A, -L0*C)
     L = np.linalg.inv(T)*L0
-    L = observer(system, config["desired_eigenvalues"], L0)
+
+    assert np.all(L == observer(system, config["desired_eigenvalues"], L0))
     system_dynamics = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, 0.01, inputs)
     success = validResultsTwo(config, L, system_dynamics, timeSteps)
     graph_results(timeSteps, system_dynamics, config["two_graph"], 'Question 2-2')
@@ -114,7 +117,8 @@ def validResultsTwo(config: json, L: np.matrix, outputs: np.matrix, times: List[
 def output_results_one(config: json,
                        system: Tuple[np.matrix],
                        Q: np.matrix,
-                       R: np.matrix,):
+                       R: np.matrix,
+                       k: np.matrix):
     A, B, C, D = system
     with open(config["tex_one_fragment"], "w") as out:
         out.write("For the system described by: " + os.linesep)
@@ -122,6 +126,8 @@ def output_results_one(config: json,
         out.write(r" and $Q = " + LatexFormat.bmatrix(Q) + r"$,")
         out.write(r"$R = " + LatexFormat.bmatrix(R) + r"$" + os.linesep)
         out.write(os.linesep)
+        out.write("This produced a k of: $" + LatexFormat.bmatrix(k) + "$")
+        out.write(os.linesep + os.linesep)
         out.write(r"The following is the outputs of the LQR system " +
                   r"assuming the inputs are 0" + os.linesep + os.linesep)
         out.write(r"\image{" + config["one_graph"].split('/')[1] + r"}{LQR system}" +

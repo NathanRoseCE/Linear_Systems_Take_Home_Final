@@ -11,7 +11,7 @@ from math import pi, degrees
 from multiprocessing import Process, Array
 from NonLinearFragment import nonLinearUpdate, nonLinearOutput
 
-THREE_CONFIG_FILE = "scripts/resources/three.json"
+THREE_CONFIG_FILE = "resources/three.json"
 
 
 def main(results: List[bool], index: int) -> None:
@@ -34,10 +34,16 @@ def three_one(config: json) -> bool:
 def three_two(config: json) -> bool:
     system = createSystem(config)
     A, B, C, D = system
-    f = F(config["desired_eig"], A.shape)
+
+    # redundant code to get intermediate values
+    f = F(config["desired_eig"])
     K0 = np.matrix(config["K0"])
     T = lyap(A, -f, -B*K0)
     k = K0 * inv(T)
+
+    # should be the same but I need the intermediate variables
+    assert np.all(k == feedback(system, config["desired_eig"], K0))
+
     x_0 = config["two_initial"]
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     outputs = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
@@ -49,10 +55,8 @@ def three_two(config: json) -> bool:
 def three_three(config: json) -> bool:
     system = createSystem(config)
     A, B, C, D = system
-    f = F(config["desired_eig"], A.shape)
     K0 = np.matrix(config["K0"])
-    T = lyap(A, -f, -B*K0)
-    k = K0 * inv(T)
+    k = feedback(system, config["desired_eig"], K0)
     x_0 = np.matrix(config["three_sample_x0"])
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     outputs = Model.ModelSystem(nonLinearUpdate,
@@ -274,9 +278,14 @@ def print_results_three(config: json,
             r"\image{" + config["three_graph"].split('/')[1] + r"}{3-3 system}{fig:3-3}" + os.linesep,
             "For the limit, the system was considered stabalized if after " + str(config["stopTime"]),
             r" seconds the system state variable $\theta$ was within $\pm" + str(config["threshold"]),
-            "$ of 0, and it had not fallen over it yet",
-            ", the result of this is a theta limit of: " + LatexFormat.round_float(theta_limit),
-            " radians which is: " + LatexFormat.round_float(degrees(theta_limit)) + " degrees" + os.linesep
+            "$ of 0, and it had not fallen over it yet" + os.linesep + os.linesep,
+            "This value is calculated by code in scripts//questionThree.py and is done by ",
+            " dividing up the region into n segments and then seeing where it fails and where it passes",
+            " then recirsively doing this until the region is less than ",
+            LatexFormat.round_float(1*(10**-LatexFormat.ROUND_TO)),
+            " difference between the max and min. ", os.linesep + os.linesep, 
+            "The result of this is a theta limit of: " + LatexFormat.round_float(theta_limit),
+            " radians or " + LatexFormat.round_float(degrees(theta_limit)) + " degrees" + os.linesep
         ])
 
 

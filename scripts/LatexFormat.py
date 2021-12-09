@@ -7,11 +7,21 @@ ROUND_TO = 3
 
 
 def round_float(val: float) -> str:
+    """
+    rounds the float to ROUND_TO decimal places and casts to a string
+    """
     return str(round(val, ROUND_TO))
 
 
 def imaginary(val: Dict[str, float]) -> str:
-    return round_float(val["real"]) + r" \pm " + round_float(val["imaginary"]) + "j"
+    """
+    rounds an imaginary number to ROUND_TO decimal places and
+    casts to a string
+    """
+    return (round_float(val["real"]) +
+            r" \pm " +
+            round_float(val["imaginary"]) +
+            "j")
 
 
 def matrix_List(vals: List, latexMatrixType: str) -> str:

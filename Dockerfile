@@ -24,7 +24,8 @@ RUN python3 -m pip install numpy \
     	       	   	   control \
 			   typing \
 			   slycot \
-			   pygments
+			   pygments \
+			   pytest
 
 # Build images
 CMD ["/bin/bash", "./build.sh"]

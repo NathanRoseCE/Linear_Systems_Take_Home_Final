@@ -3,15 +3,18 @@ import LatexFormat
 import control
 import json
 import os
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Union
 from Utilities import feedback, gen_inputs, graph_results, observer
 import Model
 import math
 
-ONE_CONFIG_FILE = "scripts/resources/one.json"
+ONE_CONFIG_FILE = "resources/one.json"
 
 
 def main(results: List[bool], index: int) -> None:
+    """
+    Main function that computes all of the results for question one
+    """
     config = {}
     with open(ONE_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
@@ -19,7 +22,14 @@ def main(results: List[bool], index: int) -> None:
     print("one success: " + str(results[index]))
 
 
-def createSystem(config: json, latex_string: bool = False):
+def createSystem(config: json,
+                 latex_string: bool = False
+                 ) -> Union[np.matrix, List[List[str]]]:
+    """
+    Creates the system described in question one. If latex_string is set it
+    will give a 2d list of latex-strings for printing rather than a numpy 
+    matrix
+    """
     neg_sigma_1 = -config["sigma_1"] if not latex_string else r"-\sigma_1"
     neg_sigma_2 = -config["sigma_2"] if not latex_string else r"-\sigma_2"
     neg_alpha_1 = -config["alpha_1"] if not latex_string else r"-\alpha_1"
@@ -53,12 +63,18 @@ def createSystem(config: json, latex_string: bool = False):
 
 
 def one_a(config: json) -> bool:
+    """ 
+    SOlves and writes the result to question 1.a
+    """
     system = createSystem(config, True)
     output_results_a(config["tex_a_fragment"], system)
     return True
 
 
 def one_b(config: json) -> bool:
+    """ 
+    SOlves and writes the result to question 1.b
+    """
     system = createSystem(config)
     A, B, C, D = system
     transfer_function = control.ss2tf(A, B, C, D)
@@ -67,6 +83,9 @@ def one_b(config: json) -> bool:
 
 
 def one_c(config: json) -> bool:
+    """ 
+    SOlves and writes the result to question 1.c
+    """
     system = createSystem(config)
     A, B, C, D = system
     desired_eigenvalues = dominantPoles(config["settling_time"],
@@ -84,6 +103,9 @@ def one_c(config: json) -> bool:
 
 
 def one_d(config: json) -> bool:
+    """ 
+    SOlves and writes the result to question 1.d
+    """
     system = createSystem(config)
     A, B, C, D = system
     desired_eigenvalues = dominantPoles(config["settling_time"],
@@ -106,6 +128,10 @@ def one_d(config: json) -> bool:
 
 
 def validCResults(config: json, times: List[float], outputs: List[np.matrix]) -> bool:
+    """ 
+    Checks to make sure the results of 1.c are valid, this involves checking that it
+    does not break the overshoot limit or the settling criterion
+    """
     settlingValue = outputs[-1].item((1,0))
     initialValue = outputs[0].item((1,0))
     overshootLimit = ((settlingValue - initialValue) * (1+config["overshoot"])) + initialValue
@@ -164,6 +190,7 @@ def dominantPoles(settlingTime: float,
                 "real": real*5
             })
             numRoots -= 1
+    print(f"roots: {roots})")
     return roots
 
 
@@ -177,9 +204,9 @@ def dampingValues(settlingTime: float,
     """
     zeta = math.pow(((math.pi/(math.log(overshootPercent)))**2) + 1, -0.5)
     naturalFreq = 4/(zeta*settlingTime)
-    print(overshootPercent)
-    print(zeta)
-    print(naturalFreq)
+    print(f"overshoot perc = {overshootPercent}")
+    print(f"zeta = {zeta}")
+    print(f"omega_n = {naturalFreq}")
     return zeta, naturalFreq
 
 
@@ -236,7 +263,7 @@ def output_results_c(config: json,
             r"\image{" + config["c_graph"].split('/')[1] + r"}{Feedback}{fig:feedback}" + os.linesep
         ])
 
-        
+
 def output_results_d(config: json,
                      obseigs: List[Dict[str, float]],
                      l0: np.matrix,
