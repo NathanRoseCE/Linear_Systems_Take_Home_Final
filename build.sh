@@ -3,6 +3,7 @@
 set -e
 
 make='make -j17'
+
 quietmode=false
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG

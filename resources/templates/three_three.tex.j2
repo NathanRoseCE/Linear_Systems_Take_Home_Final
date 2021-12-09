@@ -1,0 +1,20 @@
+The non-linear system was implimented with the following code
+
+\begin{minted}{python}
+VAR{code_str}
+\end{minted}
+
+A sample of the non-linear system with a starting state of $x_0 = VAR{ x_0 | bmatrix }$ can be seen below in
+\autoref{fig:3-3}
+
+\image{VAR{ graph }}{3-3 System}{fig:3-3}
+
+For the limit, the system was condidered stabalized if after $VAR{ stopTime | round_float}$  seconds and
+if $\theta$ was within $VAR{ threshold | round_float}$ radians of 0, and had not fallen over yet.
+
+This value is calculated by code that can be seen in scripts/questionThree.py and is done by dividing up the
+region into n segments and determining the boundrary values for where it is stabalized and where it is not this
+repeats until the the the region under question is smaller than $VAR{ tolerence | round_float }$.
+
+The result of this is a $\theta$ limit of $VAR{ theta_limit_rad | round_float }$ radians or
+$VAR{ theta_limit_deg | round_float}$ degrees.

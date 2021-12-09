@@ -4,7 +4,7 @@ import LatexFormat
 import os
 import Model
 from typing import Tuple, List
-from Utilities import F, gen_inputs, graph_results, feedback
+from Utilities import F, gen_inputs, graph_results, feedback, renderTemplate
 from control import lyap
 from numpy.linalg import inv
 from math import pi, degrees
@@ -222,21 +222,14 @@ def createSystem(config: json, latex_string: bool = False, onlyTheta: bool=False
 
 
 def print_results_one(config: json, system: Tuple[str]):
-    A, B, C, D = system
-    with open(config["tex_one_fragment"], 'w') as out:
-        out.writelines([
-            "For the system with state matrix:" + os.linesep,
-            r"\begin{equation}" + os.linesep,
-            r"x = ",
-            LatexFormat.bmatrix([["y"],
-                                 [r"\dot y"],
-                                 [r"\theta"],
-                                 [r"\dot \theta"]
-                                 ]),
-            r"\end{equation}" + os.linesep,
-            "The following system is described:" + os.linesep,
-            LatexFormat.system(system)
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_one_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_one_fragment"]}',
+                   system=system,
+                   x = [["y"],
+                        [r"\dot y"],
+                        [r"\theta"],
+                        [r"\dot \theta"]])
 
 
 def print_results_two(config: json,
@@ -244,21 +237,14 @@ def print_results_two(config: json,
                       f: np.matrix,
                       k0: np.matrix,
                       k: np.matrix):
-    A, B, C, D = system
-    with open(config["tex_two_fragment"], 'w') as out:
-        out.writelines([
-            "The input values were: " + os.linesep,
-            r"\begin{tabular}{c|c}" + os.linesep,
-            r"$K_0$ & $" + LatexFormat.bmatrix(k0) + r" $ \\",
-            r"$F$ & $" + LatexFormat.bmatrix(f) + r" $ \\",
-            r"\end{tabular}" + os.linesep,
-            r"this produced a k of: " + os.linesep,
-            r"\begin{equation}" + os.linesep,
-            r"  k = " + LatexFormat.bmatrix(k),
-            r"\end{equation}" + os.linesep + os.linesep,
-            r"With this feedback value the following outputs were made:" + os.linesep,
-            r"\image{" + config["two_graph"].split('/')[1] + r"}{3-2 system}{fig:3-2}" + os.linesep
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_two_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_two_fragment"]}',
+                   system=system,
+                   k0=k0,
+                   f=f,
+                   k=k,
+                   graph=config["two_graph"])
 
 
 def print_results_three(config: json,
@@ -267,35 +253,23 @@ def print_results_three(config: json,
     code_str = ""
     with open("scripts/NonLinearFragment.py") as file:
         code_str = file.read()
-    with open(config["tex_three_fragment"], 'w') as out:
-        out.writelines([
-            "The non-linear system was implimented with the following code" + os.linesep,
-            r"\begin{minted}{python3}" + os.linesep,
-            code_str,
-            r"\end{minted}" + os.linesep,
-            "A sample with starting inputs of: $" +
-            LatexFormat.bmatrix(x0Sample) + "$ produces the followung outputs" + os.linesep,
-            r"\image{" + config["three_graph"].split('/')[1] + r"}{3-3 system}{fig:3-3}" + os.linesep,
-            "For the limit, the system was considered stabalized if after " + str(config["stopTime"]),
-            r" seconds the system state variable $\theta$ was within $\pm" + str(config["threshold"]),
-            "$ of 0, and it had not fallen over it yet" + os.linesep + os.linesep,
-            "This value is calculated by code in scripts//questionThree.py and is done by ",
-            " dividing up the region into n segments and then seeing where it fails and where it passes",
-            " then recirsively doing this until the region is less than ",
-            LatexFormat.round_float(1*(10**-LatexFormat.ROUND_TO)),
-            " difference between the max and min. ", os.linesep + os.linesep, 
-            "The result of this is a theta limit of: " + LatexFormat.round_float(theta_limit),
-            " radians or " + LatexFormat.round_float(degrees(theta_limit)) + " degrees" + os.linesep
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_three_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_three_fragment"]}',
+                   code_str=code_str,
+                   graph=config["three_graph"],
+                   stopTime=config["stopTime"],
+                   threshold=config["threshold"],
+                   tolerence=(1*(10**-LatexFormat.ROUND_TO)),
+                   theta_limit_rad=theta_limit,
+                   theta_limit_deg=degrees(theta_limit))
 
 
 def print_results_four(config: json):
-    with open(config["tex_four_fragment"], 'w') as out:
-        out.writelines([
-            "The comparison betweeen the linear and nonlinear system can be seen" + os.linesep,
-            r"in the system below in \autoref{fig:comparison}" + os.linesep,
-            r"\image{" + config["four_graph"].split('/')[1] + r"}{Comparison}{fig:comparison}" + os.linesep
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_four_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_four_fragment"]}',
+                   graph=config["four_graph"])
 
 
 if __name__ == '__main__':

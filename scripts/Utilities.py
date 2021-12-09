@@ -1,9 +1,10 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Callable
 import numpy as np
 import matplotlib.pyplot as plt
 from control import lyap
 from numpy.linalg import inv
-
+from jinja2 import Template, Environment, FileSystemLoader
+import os
 
 def F(desiredEigens: List[dict]):
     """
@@ -85,3 +86,31 @@ def observer(system: Tuple[np.matrix],
     f = F(desiredEig)
     T = lyap(-f, A, -L0*C)
     return np.linalg.inv(T)*L0
+
+
+_latex_jinja_env = Environment(
+    block_start_string='BLOCK{',
+    block_end_string='}',
+    variable_start_string='VAR{',
+    variable_end_string='}',
+    comment_start_string='#{',
+    comment_end_string='}',
+    line_statement_prefix='%-',
+    line_comment_prefix='%#',
+    trim_blocks=True,
+    autoescape=False,
+    loader=FileSystemLoader(os.path.abspath('.'))
+)
+
+
+def registerTemplateFilter(name: str,
+                           filter: Callable[[any], str]):
+    _latex_jinja_env.filters[name] = filter
+
+
+def renderTemplate(templateFile: str,
+                   outFile: str,
+                   **args):
+    template = _latex_jinja_env.get_template(templateFile)
+    with open(outFile, "w") as out:
+        out.write(template.render(**args))

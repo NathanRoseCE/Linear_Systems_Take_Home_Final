@@ -4,7 +4,7 @@ import control
 import json
 import os
 from typing import Tuple, List, Dict, Union
-from Utilities import feedback, gen_inputs, graph_results, observer
+from Utilities import feedback, gen_inputs, graph_results, observer, renderTemplate
 import Model
 import math
 
@@ -67,7 +67,7 @@ def one_a(config: json) -> bool:
     SOlves and writes the result to question 1.a
     """
     system = createSystem(config, True)
-    output_results_a(config["tex_a_fragment"], system)
+    output_results_a(config, system)
     return True
 
 
@@ -78,7 +78,7 @@ def one_b(config: json) -> bool:
     system = createSystem(config)
     A, B, C, D = system
     transfer_function = control.ss2tf(A, B, C, D)
-    output_results_b(config["tex_b_fragment"], system, transfer_function)
+    output_results_b(config, system, transfer_function)
     return True
 
 
@@ -97,7 +97,11 @@ def one_c(config: json) -> bool:
     x_0 = np.matrix(config["x0"])
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     outputs = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
-    graph_results(timeSteps, outputs, config["c_graph"], "Feedback", ["x", "theta"])
+    graph_results(timeSteps,
+                  outputs,
+                  f'{config["outdir"]}/{config["c_graph"]}',
+                  "Feedback",
+                  ["x", "theta"])
     output_results_c(config, desired_eigenvalues, k)
     return validCResults(config, timeSteps, outputs)
 
@@ -118,11 +122,23 @@ def one_d(config: json) -> bool:
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     L0 = np.matrix(config["L0"])
     x_e_0 = np.matrix(config["x_e_0"])
-    observerEig = [ {"real": eig["real"]*config["observerScale"], "imaginary": eig["imaginary"]}
-                     for eig in desired_eigenvalues]
+    observerEig = [{
+        "real": eig["real"]*config["observerScale"],
+        "imaginary": eig["imaginary"]
+    } for eig in desired_eigenvalues]
     L = observer(system, observerEig, L0)
-    outputs = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, config["dt"], inputs)
-    graph_results(timeSteps, outputs, config["d_graph"], "Feedback with Observer", ["x", "theta"])
+    outputs = Model.linearFullObserverWithFeedback(system=system,
+                                                   L=L,
+                                                   k=k,
+                                                   x_0=x_0,
+                                                   x_e_0=x_e_0,
+                                                   dt=config["dt"],
+                                                   inputs=inputs)
+    graph_results(timeSteps,
+                  outputs,
+                  f'{config["outdir"]}/{config["d_graph"]}',
+                  "Feedback with Observer",
+                  ["x", "theta"])
     output_results_d(config, observerEig, L0, L, x_e_0)
     return True
 
@@ -210,58 +226,37 @@ def dampingValues(settlingTime: float,
     return zeta, naturalFreq
 
 
-def output_results_a(outfile: str,
+def output_results_a(config: json,
                      system: Tuple[np.matrix]):
-    A, B, C, D = system
-    with open(outfile, 'w') as out:
-        out.writelines([
-            "For the system with state variables:",
-            r"\begin{equation}" + os.linesep,
-            r"x = " + os.linesep,
-            r"\begin{bmatrix}" + os.linesep,
-            r"x\\" + os.linesep,
-            r"\dot x\\" + os.linesep,
-            r"\theta\\" + os.linesep,
-            r"\dot \theta\\" + os.linesep,
-            r"\end{bmatrix}",
-            r"\end{equation}",
-            "The state space representation is: ",
-            LatexFormat.system(system)
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_a_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_a_fragment"]}',
+                   system=system,
+                   x=[["x"],
+                      [r"\dot x"],
+                      [r"\theta"],
+                      [r"\dot \theta"]])
 
 
-def output_results_b(outfile: str,
+def output_results_b(config: json,
                      system: Tuple[np.matrix],
                      transfer: control.tf):
-    with open(outfile, 'w') as out:
-        out.writelines([
-            "For the system described by: ",
-            LatexFormat.system(system),
-            "",
-            "A realization was determined by taking the realization ",
-            "of the state space representation. The result of this is: ",
-            r"\begin{equation}",
-            "g(s) = " + LatexFormat.transferFunction(transfer),
-            r"\end{equation}",
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_b_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_b_fragment"]}',
+                   system=system,
+                   tf=transfer)
 
 
 def output_results_c(config: json,
                      eigs: List[Dict[str, float]],
                      k: np.matrix):
-    with open(config["tex_c_fragment"], 'w') as out:
-        out.writelines([
-            "To meet requirements the following requirements were chosen: ",
-            r"\begin{enumerate}" + os.linesep,
-            (r"\\" + "\n").join([r"\item$" + LatexFormat.imaginary(eig) + "$" for eig in eigs]),
-            r"\end{enumerate}" + os.linesep,
-            "This created a feedback of: " + os.linesep,
-            r"\begin{equation}",
-            "k = " + LatexFormat.bmatrix(k),
-            r"\end{equation}",
-            r"this produced a response which can be seen below in \autoref{fig:feedback}" + os.linesep,
-            r"\image{" + config["c_graph"].split('/')[1] + r"}{Feedback}{fig:feedback}" + os.linesep
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_c_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_c_fragment"]}',
+                   eigs=eigs,
+                   k=k,
+                   graph=config["c_graph"])
 
 
 def output_results_d(config: json,
@@ -269,22 +264,15 @@ def output_results_d(config: json,
                      l0: np.matrix,
                      L: np.matrix,
                      x_e_0: np.matrix):
-    with open(config["tex_d_fragment"], 'w') as out:
-        out.writelines([
-            "The observer was chosen to have eigenvalues " + LatexFormat.round_float(config["observerScale"]),
-            " further out than the feedback. This resulted in eigenvalaues of:" 
-            r"\begin{enumerate}" + os.linesep,
-            (r"\\" + "\n").join([r"\item$" + LatexFormat.imaginary(eig) + "$" for eig in obseigs]),
-            r"\end{enumerate}" + os.linesep,
-            f"L was determined from an L0 of $" + LatexFormat.bmatrix(l0) + "$" + os.linesep + os.linesep,
-            "This led to an L matrix of: "
-            r"\begin{equation}",
-            "L = " + LatexFormat.bmatrix(L),
-            r"\end{equation}",
-            r"this produced a response which can be seen below in \autoref{fig:observer}" + os.linesep,
-            r"assuming a $x_{e0} = " + LatexFormat.bmatrix(x_e_0) + "$:" + os.linesep,
-            r"\image{" + config["d_graph"].split('/')[1] + r"}{Observer}{fig:observer}" + os.linesep
-        ])
+    templateFile = f'{config["templatedir"]}/{config["tex_d_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_d_fragment"]}',
+                   scale=config["observerScale"],
+                   eigs=obseigs,
+                   l0=l0,
+                   L=L,
+                   x_e_0=x_e_0,
+                   graph=config["d_graph"])
 
 
 if __name__ == '__main__':
@@ -292,3 +280,11 @@ if __name__ == '__main__':
     main(result, 0)
     if not result[0]:
         exit(1)
+
+
+def output_overall_results(config: json):
+    templateFile = f'{config["templatedir"]}/{config["tex_d_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_d_fragment"]}',
+                   scale=config["observerScale"],
+                   graph=config["d_graph"])

@@ -1,0 +1,21 @@
+For the system described by:
+VAR{system | formatSystem}
+
+The following variables were used to generate the observer:
+
+\begin{tabular}{r|l}
+$L_0$ & $VAR{L0 | bmatrix}$ \\
+$F$ & $VAR{F | bmatrix}$
+\end{tabular}
+
+With these values, the following outputs were calculated:
+
+
+\begin{tabular}{r|l}
+$T$ & $VAR{T | bmatrix}$ \\
+$L$ & $VAR{L | bmatrix}$
+\end{tabular}
+
+The following is the output of the LQR of the system, This also assumes the inputs are the unit step
+function with an initial estimate of the state of: $x_{e0} = VAR{x_e_0 | bmatrix}$
+\image{ VAR{image_path}}{LQR System}{fig:two_two}

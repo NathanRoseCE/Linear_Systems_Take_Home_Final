@@ -10,7 +10,7 @@ def ModelSystem(update: Callable[[np.matrix, np.matrix], np.matrix],
                 inputs: List[np.matrix],
                 *args) -> List[Tuple]:
     """
-    A generic model for any system  can work with linear and nonlinear
+    A generic model for any system can work with linear and nonlinear
     systems. update functions returns the next state, and output outputs
     the output matrix. Both of these functions take in state, system input,
     then *args.
@@ -64,8 +64,8 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
                                    dt: float,
                                    inputs: List[np.matrix]) -> List[np.matrix]:
     """
-    Models a linear system with state feedback, assumes system.A is without
-    feedback
+    Models a linear system with state feedback and a full state observer, this is only valid if
+    D is a zero matrix
     \\dot x = Ax + Bu
     y = Cx + Du
     u = r + kx
@@ -76,15 +76,17 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
     inputs = deepcopy(inputs)
     outputs = []
     A, B, C, D = deepcopy(system)
+    if not np.all(D == 0):
+        raise ValueError("D matrix should be all 0's")
+
     x = deepcopy(x_0)
-    x_e = deepcopy(x_e_0)
-    y_e = np.zeros((C.shape[0], 1))
     k = np.matrix(k)
 
+    x_e = deepcopy(x_e_0)
     A_est = A - L*C
     B_est = np.identity(A.shape[0])
     C_est = np.identity(A.shape[0])
-    D_est = deepcopy(D)
+    D_est = np.identity(A.shape[0])
     for r in inputs:
         # feedback step
         u = r - (k*x_e)
@@ -96,7 +98,6 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
         # estimator step
         u_est = (B*u) + (L*y)
         x_e = _linearUpdate(x_e, u_est, (A_est, B_est, C_est, D_est), dt)
-
         outputs.append(y)
     return outputs
 

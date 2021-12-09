@@ -1,0 +1,16 @@
+To meet requirements the following eigenvalues were chose:
+
+\begin{enumerate}
+BLOCK{ for eig in eigs }
+\item $VAR{eig | imaginary}$
+BLOCK{ endfor }
+\end{enumerate}
+
+These eigenvalues were then use to create a feedback matrix of:
+\begin{equation}
+k = VAR{ k | bmatrix }
+\end{equation}
+
+This produced a reeponse which can be seen below in \autoref{fig:feedback}
+
+\image{VAR{graph}}{Feedback}{fig:feedback}

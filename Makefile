@@ -3,20 +3,23 @@
 
 Utilities = scripts/LatexFormat.py scripts/Model.py scripts/Utilities.py
 texFiles = ./content.tex ./functions.tex
+q_one_template = ./resources/templates/one_*.tex.j2
+q_two_template = ./resources/templates/two_*.tex.j2
+q_three_template = ./resources/templates/three_*.tex.j2
 py = python3
 latex = pdflatex -shell-escape
 
 all : results/question-one results/question-two results/question-three Final.pdf
 
-results/question-one : scripts/questionOne.py resources/one.json $(Utilities) 
+results/question-one : scripts/questionOne.py resources/one.json $(Utilities) $(q_one_template)
 	$(py) scripts/questionOne.py
 	touch results/question-one
 
-results/question-two : scripts/questionTwo.py resources/two.json $(Utilities)
+results/question-two : scripts/questionTwo.py resources/two.json $(Utilities) $(q_two_template)
 	$(py) scripts/questionTwo.py
 	touch results/question-two
 
-results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities)
+results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities) $(q_three_template)
 	$(py) scripts/questionThree.py
 	touch results/question-three
 

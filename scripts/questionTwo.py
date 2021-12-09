@@ -6,7 +6,7 @@ from control import lqr
 from control import lyap
 import json
 from typing import List, Tuple
-from Utilities import F, gen_inputs, graph_results, observer
+from Utilities import F, gen_inputs, graph_results, observer, renderTemplate
 
 TWO_CONFIG_FILE = "resources/two.json"
 
@@ -47,7 +47,10 @@ def part_one(system: Tuple[np.matrix], config: json) -> bool:
     timeSteps = [float(timeStep) for timeStep in np.arange(0, stopTime, dt)]
     system_dynamics = Model.linearWithFeedback(system, k, initialState, 0.01, inputs)
     success = validResultsOne(config, k, system_dynamics, timeSteps)
-    graph_results(timeSteps, system_dynamics, config["one_graph"], 'Question 2-1')
+    graph_results(timeSteps,
+                  system_dynamics,
+                  f'{config["outdir"]}/{config["one_graph"]}',
+                  'Question 2-1')
     if success:
         output_results_one(config, system, q, r, k)
     return success
@@ -67,11 +70,14 @@ def part_two(system: Tuple[np.matrix], config: json) -> bool:
     f = F(config["desired_eigenvalues"])
     T = lyap(-f, A, -L0*C)
     L = np.linalg.inv(T)*L0
-
     assert np.all(L == observer(system, config["desired_eigenvalues"], L0))
+
     system_dynamics = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, 0.01, inputs)
     success = validResultsTwo(config, L, system_dynamics, timeSteps)
-    graph_results(timeSteps, system_dynamics, config["two_graph"], 'Question 2-2')
+    graph_results(timeSteps,
+                  system_dynamics,
+                  f'{config["outdir"]}/{config["two_graph"]}',
+                  'Question 2-2')
     if success:
         output_results_two(config, system, f, T, L0, L, x_e_0)
     return success
@@ -119,19 +125,14 @@ def output_results_one(config: json,
                        Q: np.matrix,
                        R: np.matrix,
                        k: np.matrix):
-    A, B, C, D = system
-    with open(config["tex_one_fragment"], "w") as out:
-        out.write("For the system described by: " + os.linesep)
-        out.write(LatexFormat.system(system))
-        out.write(r" and $Q = " + LatexFormat.bmatrix(Q) + r"$,")
-        out.write(r"$R = " + LatexFormat.bmatrix(R) + r"$" + os.linesep)
-        out.write(os.linesep)
-        out.write("This produced a k of: $" + LatexFormat.bmatrix(k) + "$")
-        out.write(os.linesep + os.linesep)
-        out.write(r"The following is the outputs of the LQR system " +
-                  r"assuming the inputs are 0" + os.linesep + os.linesep)
-        out.write(r"\image{" + config["one_graph"].split('/')[1] + r"}{LQR system}" +
-                  r"{fig:two_one}")
+    templateFile = f'{config["templatedir"]}/{config["tex_one_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_one_fragment"]}',
+                   system=system,
+                   R=R,
+                   Q=Q,
+                   k=k,
+                   image_path=config["one_graph"])
 
 
 def output_results_two(config: json,
@@ -141,26 +142,16 @@ def output_results_two(config: json,
                        L0: np.matrix,
                        L: np.matrix,
                        x_e_0: np.matrix):
-    A, B, C, D = system
-    with open(config["tex_two_fragment"], "w") as out:
-        out.write("For the system described by: " + os.linesep)
-        out.write(LatexFormat.system(system))
-        out.write(r"The following variables were chosen for the observer:" + os.linesep + os.linesep)
-        out.write(r"\begin{tabular}{r|l}" + os.linesep)
-        out.write(r"$L_0$ & $" + LatexFormat.bmatrix(L0) + r"$\\" + os.linesep)
-        out.write(r"$F$ & $" + LatexFormat.bmatrix(F) + r"$\\" + os.linesep)
-        out.write(r"\end{tabular}" + os.linesep + os.linesep)
-        out.write(r"These were used to calculate: " + os.linesep + os.linesep)
-        out.write(r"\begin{tabular}{r|l}" + os.linesep)
-        out.write(r"$T$ & $" + LatexFormat.bmatrix(T) + r"$\\" + os.linesep)
-        out.write(r"$L$ & $" + LatexFormat.bmatrix(L) + r"$\\" + os.linesep)
-        out.write(r"\end{tabular}" + os.linesep)
-        out.write(os.linesep)
-        out.write(r"The following is the outputs of the LQR system " +
-                  r"assuming the inputs are 0 and an initial estimate of "
-                  r"state of $" + LatexFormat.bmatrix(x_e_0) + "$" + os.linesep + os.linesep)
-        out.write(r"\image{" + config["two_graph"].split('/')[1] + r"}{LQR system}" +
-                  r"{fig:two_two}")
+    templateFile = f'{config["templatedir"]}/{config["tex_two_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_two_fragment"]}',
+                   system=system,
+                   F=F,
+                   T=T,
+                   L0=L0,
+                   L=L,
+                   x_e_0=x_e_0,
+                   image_path=config["two_graph"])
 
 
 if __name__ == '__main__':
