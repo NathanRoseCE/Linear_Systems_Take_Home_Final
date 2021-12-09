@@ -9,22 +9,22 @@ q_three_template = ./resources/templates/three_*.tex.j2
 py = python3
 latex = pdflatex -shell-escape
 
-all : results/question-one results/question-two results/question-three Final.pdf
+all : results/one.tex results/two.tex results/three.tex Final.pdf
 
-results/question-one : scripts/questionOne.py resources/one.json $(Utilities) $(q_one_template)
+results/one.tex : scripts/questionOne.py resources/one.json $(Utilities) $(q_one_template)
 	$(py) scripts/questionOne.py
 	touch results/question-one
 
-results/question-two : scripts/questionTwo.py resources/two.json $(Utilities) $(q_two_template)
+results/two.tex : scripts/questionTwo.py resources/two.json $(Utilities) $(q_two_template)
 	$(py) scripts/questionTwo.py
 	touch results/question-two
 
-results/question-three : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities) $(q_three_template)
+results/three.tex : scripts/questionThree.py scripts/NonLinearFragment.py resources/three.json $(Utilities) $(q_three_template)
 	$(py) scripts/questionThree.py
 	touch results/question-three
 
 #latex has to be run twice because its fun like that
-Final.pdf : results/question-one results/question-two results/question-three $(texFiles)
+Final.pdf : results/one.tex results/two.tex results/three.tex $(texFiles)
 	$(latex) Final.tex
 	$(latex) Final.tex
 

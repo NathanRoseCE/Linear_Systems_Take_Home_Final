@@ -36,12 +36,7 @@ for how to build easily see the README.md file
     specifications included in part
   \end{enumerate}
 }{
-  \begin{enumerate}[(\alph*)]
-  \item \subimport{./results/}{one_a.tex}
-  \item \subimport{./results/}{one_b.tex}
-  \item \subimport{./results/}{one_feedback.tex}
-  \item \subimport{./results/}{one_d.tex}
-  \end{enumerate}
+  \subimport{./results/}{one.tex}
 }
 \question{2}{30pts}{
   The open loop system
@@ -84,20 +79,7 @@ for how to build easily see the README.md file
     same figure for $t \in [0,20]$
   \end{enumerate}
 }{
-  \begin{enumerate}[\arabic*)]
-  \item Assume that x is availbale for state feedback. Design and LQR control law by letting $R=1$ and choosing
-    $Q$ so that all the elements of the feedback gain $K$ have absolute value less than 50.\\
-    Requirement: $\vert y_1(t)\vert \le 0.05$,$\vert y_2(t)\vert \le 0.05$, for all $t > 5$. Plot $y_1(t)$ and
-    $y_2(t)$ in the same figure for $t \in [0,20]$ \\
-    \subimport{./results/}{two_one.tex}
-  \item Assume that only the output $y$ is available. Design an observer so that the poles of the observer are
-    $-5 \pm j5, -10$. Choose the observer gain so that all the elments have absolute value less than 80. Form a
-    closed loop system along with the LQR controller in step \ref{step:2-1}. Plot $y_1(t)$ and $y_2(t)$ in the
-    same figure for $t \in [0,20]$
-    \subimport{./results/}{two_two.tex}
-  \end{enumerate}
-
-
+  \subimport{./results/}{two.tex}
 }
 
 \question{3}{40pts}{
@@ -181,10 +163,5 @@ for how to build easily see the README.md file
     $\theta(t)$ for the linearized system and the nonlinear system under the same feedback $u - F_1x$
   \end{enumerate}
 }{% work for question 3
-  \begin{enumerate}[\arabic*.]
-  \item \subimport{./results/}{three_one.tex}
-  \item \subimport{./results/}{three_two.tex}
-  \item \subimport{./results/}{three_three.tex}
-  \item \subimport{./results/}{three_four.tex}
-  \end{enumerate}
+  \subimport{./results/}{three.tex}
 }

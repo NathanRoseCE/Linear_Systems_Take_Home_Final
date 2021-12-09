@@ -21,6 +21,7 @@ def main(results: List[bool], index: int) -> None:
     success = part_one(system, config)
     success &= part_two(system, config)
     results[index] = success
+    output_overall_results(config)
     print("two success: " + str(results[index]))
 
 
@@ -152,6 +153,14 @@ def output_results_two(config: json,
                    L=L,
                    x_e_0=x_e_0,
                    image_path=config["two_graph"])
+
+
+def output_overall_results(config: json):
+    templateFile = f'{config["templatedir"]}/{config["tex_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_fragment"]}',
+                   two_one=config["tex_one_fragment"],
+                   two_two=config["tex_two_fragment"])
 
 
 if __name__ == '__main__':

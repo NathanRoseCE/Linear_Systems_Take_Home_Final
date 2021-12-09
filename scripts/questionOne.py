@@ -19,6 +19,7 @@ def main(results: List[bool], index: int) -> None:
     with open(ONE_CONFIG_FILE, "r") as read_file:
         config = json.load(read_file)
     results[index] = one_a(config) and one_b(config) and one_c(config) and one_d(config)
+    output_overall_results(config)
     print("one success: " + str(results[index]))
 
 
@@ -275,16 +276,18 @@ def output_results_d(config: json,
                    graph=config["d_graph"])
 
 
+def output_overall_results(config: json):
+    templateFile = f'{config["templatedir"]}/{config["tex_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_fragment"]}',
+                   one_a=config["tex_a_fragment"],
+                   one_b=config["tex_b_fragment"],
+                   one_c=config["tex_c_fragment"],
+                   one_d=config["tex_d_fragment"])
+
+
 if __name__ == '__main__':
     result = [False]
     main(result, 0)
     if not result[0]:
         exit(1)
-
-
-def output_overall_results(config: json):
-    templateFile = f'{config["templatedir"]}/{config["tex_d_fragment"]}.j2'
-    renderTemplate(templateFile,
-                   f'{config["outdir"]}/{config["tex_d_fragment"]}',
-                   scale=config["observerScale"],
-                   graph=config["d_graph"])

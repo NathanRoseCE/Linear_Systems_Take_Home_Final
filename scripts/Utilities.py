@@ -3,8 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from control import lyap
 from numpy.linalg import inv
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 import os
+
 
 def F(desiredEigens: List[dict]):
     """
@@ -21,6 +22,7 @@ def F(desiredEigens: List[dict]):
         if "imaginary" in desired_eig:
             imaginary = desired_eig["imaginary"]
             F[i][i] = real
+            imaginary = abs(imaginary)
             F[i+1][i] = -imaginary
             F[i][i+1] = imaginary
             i = i + 1
@@ -72,7 +74,13 @@ def feedback(system: Tuple[np.matrix],
     A, B, C, D = system
     f = F(desiredEig)
     T = lyap(A, -f, -B*K0)
-    return K0 * inv(T)
+    K = K0 * inv(T)
+    desiredEigs = eigs(desiredEig)
+    actualEigs = np.linalg.eigvals(A-B*K)
+    assert np.all(
+        [np.any(desiredEig in actualEigs for desiredEig in desiredEigs)]
+    )
+    return K
 
 
 def observer(system: Tuple[np.matrix],
@@ -85,13 +93,23 @@ def observer(system: Tuple[np.matrix],
     A, B, C, D = system
     f = F(desiredEig)
     T = lyap(-f, A, -L0*C)
-    return np.linalg.inv(T)*L0
+    L = np.linalg.inv(T)*L0
+    desiredEigs = eigs(desiredEig)
+    actualEigs = np.linalg.eigvals(A-L*C)
+    assert np.all(
+        [np.any(desiredEig in actualEigs for desiredEig in desiredEigs)]
+    )
+    return L
 
 
+"""
+This is the private jinja environment that is used to render
+the templates
+"""
 _latex_jinja_env = Environment(
-    block_start_string='BLOCK{',
+    block_start_string=r'\BLOCK{',
     block_end_string='}',
-    variable_start_string='VAR{',
+    variable_start_string=r'\VAR{',
     variable_end_string='}',
     comment_start_string='#{',
     comment_end_string='}',
@@ -105,12 +123,36 @@ _latex_jinja_env = Environment(
 
 def registerTemplateFilter(name: str,
                            filter: Callable[[any], str]):
+    """
+    This function is used to registser a jinja filter
+    for the templates
+    """
     _latex_jinja_env.filters[name] = filter
 
 
 def renderTemplate(templateFile: str,
                    outFile: str,
                    **args):
+    """
+    renders a jinja file located at template file and writes it to
+    out file. The args are passed to the template engine
+    """
     template = _latex_jinja_env.get_template(templateFile)
     with open(outFile, "w") as out:
         out.write(template.render(**args))
+
+
+def eigs(eigs: Dict[str, float]) -> List[complex]:
+    """
+    This function is used to turn the dictonary complex numbers into the
+    native python version
+    """
+    return_eigs = []
+    for eig in eigs:
+        eigVal = eig["real"]
+        if ("imaginary" in eig) and (eig["imaginary"] != 0):
+            return_eigs.append(eigVal + (1j*eig["imaginary"]))
+            return_eigs.append(eigVal - (1j*eig["imaginary"]))
+            continue
+        return_eigs.append(eigVal)
+    return return_eigs

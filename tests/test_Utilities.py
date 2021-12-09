@@ -45,7 +45,6 @@ def test_F_complex():
     assert np.all(f == f_exp)
 
 
-
 def test_gen_inputs():
     stop_time = 20
     dt = 0.01
@@ -128,3 +127,19 @@ def test_observer(system):
     assert np.any(np.isclose(-3+2j, actual_eigs, atol=1e-8))
     assert np.any(np.isclose(-3-2j, actual_eigs, atol=1e-8))
     assert np.any(np.isclose(-20, actual_eigs, atol=1e-8))
+
+
+def test_eigs():
+    eigs = [
+        {
+            "real": 2,
+            "imaginary": 3
+        },
+        {
+            "real": -4
+        }
+    ]
+    actual_eigs = util.eigs(eigs)
+    assert np.any(np.isclose(2+3j, actual_eigs, atol=1e-8))
+    assert np.any(np.isclose(2-3j, actual_eigs, atol=1e-8))
+    assert np.any(np.isclose(-4, actual_eigs, atol=1e-8))

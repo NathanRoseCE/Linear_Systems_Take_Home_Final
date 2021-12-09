@@ -10,6 +10,7 @@
     "overshoot": 0.2,
     "outdir": "results",
     "templatedir": "resources/templates",
+    "tex_fragment": "one.tex",
     "tex_a_fragment": "one_a.tex",
     "tex_b_fragment": "one_b.tex",
     "tex_c_fragment": "one_feedback.tex",

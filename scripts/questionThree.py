@@ -22,6 +22,7 @@ def main(results: List[bool], index: int) -> None:
                       three_two(config) and
                       three_three(config) and
                       three_four(config))
+    output_overall_results(config)
     print("three success: " + str(results[index]))
 
 
@@ -270,6 +271,16 @@ def print_results_four(config: json):
     renderTemplate(templateFile,
                    f'{config["outdir"]}/{config["tex_four_fragment"]}',
                    graph=config["four_graph"])
+
+
+def output_overall_results(config: json):
+    templateFile = f'{config["templatedir"]}/{config["tex_fragment"]}.j2'
+    renderTemplate(templateFile,
+                   f'{config["outdir"]}/{config["tex_fragment"]}',
+                   three_one=config["tex_one_fragment"],
+                   three_two=config["tex_two_fragment"],
+                   three_three=config["tex_three_fragment"],
+                   three_four=config["tex_four_fragment"])
 
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@
 	      [1.0]],
     "outdir": "results",
     "templatedir": "resources/templates",
+    "tex_fragment": "two.tex",
     "tex_one_fragment": "two_one.tex",
     "tex_two_fragment": "two_two.tex",
     "one_graph": "two_one_output.png",
