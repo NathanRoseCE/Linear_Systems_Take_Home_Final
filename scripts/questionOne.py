@@ -85,7 +85,7 @@ def one_b(config: json) -> bool:
 
 def one_c(config: json) -> bool:
     """ 
-    SOlves and writes the result to question 1.c
+    Solves and writes the result to question 1.c
     """
     system = createSystem(config)
     A, B, C, D = system
@@ -109,7 +109,7 @@ def one_c(config: json) -> bool:
 
 def one_d(config: json) -> bool:
     """ 
-    SOlves and writes the result to question 1.d
+    Solves and writes the result to question 1.d
     """
     system = createSystem(config)
     A, B, C, D = system
@@ -157,7 +157,6 @@ def validCResults(config: json, times: List[float], outputs: List[np.matrix]) ->
 
     success = True
     for time, output in zip(times, outputs):
-        # x = output.item((0, 0))
         theta = output.item((1, 0))
         # ensure its in the settling range
         if time > config["settling_time"]:

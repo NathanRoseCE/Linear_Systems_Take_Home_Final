@@ -123,3 +123,4 @@ def _linearOutput(x: np.matrix,
     """
     A, B, C, D = system
     return (C*x) + (D*r)
+

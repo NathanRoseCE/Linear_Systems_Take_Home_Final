@@ -73,7 +73,13 @@ def part_two(system: Tuple[np.matrix], config: json) -> bool:
     L = np.linalg.inv(T)*L0
     assert np.all(L == observer(system, config["desired_eigenvalues"], L0))
 
-    system_dynamics = Model.linearFullObserverWithFeedback(system, L, k, x_0, x_e_0, 0.01, inputs)
+    system_dynamics = Model.linearFullObserverWithFeedback(system=system,
+                                                           L=L,
+                                                           k=k,
+                                                           x_0=x_0,
+                                                           x_e_0=x_e_0,
+                                                           dt=config["dt"],
+                                                           inputs=inputs)
     success = validResultsTwo(config, L, system_dynamics, timeSteps)
     graph_results(timeSteps,
                   system_dynamics,
