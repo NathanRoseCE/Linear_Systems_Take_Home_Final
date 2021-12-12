@@ -25,6 +25,5 @@ Simply download the tools from the appropriate websites:
 After that you simply need to be in the root directory of the projectopen a (preferably bash) terminal and run:
 
 ``` bash
-
 docker-compose up --build
 ```

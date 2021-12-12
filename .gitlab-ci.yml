@@ -1,9 +1,0 @@
-image:
-  name: nathanrosece/latex-python-templating
-  entrypoint: [""]
-
-Building Documents:
-  stage: build
-  script:
-    - python3 tests/testMain.py
-    - make -j10 
