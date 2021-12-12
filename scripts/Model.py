@@ -78,7 +78,6 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
     A, B, C, D = deepcopy(system)
     if not np.all(D == 0):
         raise ValueError("D matrix should be all 0's")
-
     x = deepcopy(x_0)
     k = np.matrix(k)
 
@@ -87,6 +86,7 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
     B_est = np.identity(A.shape[0])
     C_est = np.identity(A.shape[0])
     D_est = np.identity(A.shape[0])
+    sys_est = (A_est, B_est, C_est, D_est)
     for r in inputs:
         # feedback step
         u = r - (k*x_e)
@@ -97,7 +97,7 @@ def linearFullObserverWithFeedback(system: Tuple[np.matrix],
 
         # estimator step
         u_est = (B*u) + (L*y)
-        x_e = _linearUpdate(x_e, u_est, (A_est, B_est, C_est, D_est), dt)
+        x_e = _linearUpdate(x_e, u_est, sys_est, dt)
         outputs.append(y)
     return outputs
 

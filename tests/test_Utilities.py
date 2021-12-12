@@ -143,3 +143,36 @@ def test_eigs():
     assert np.any(np.isclose(2+3j, actual_eigs, atol=1e-8))
     assert np.any(np.isclose(2-3j, actual_eigs, atol=1e-8))
     assert np.any(np.isclose(-4, actual_eigs, atol=1e-8))
+
+
+def test_controllable_when_controllable(system):
+    A, B, C, D = system
+    assert util.controllable(A, B)
+
+
+def test_controllable_when_uncontrollable(system):
+    A, B, C, D = system
+    B = np.zeros(B.shape)
+    assert not util.controllable(A, B)
+
+
+def test_observable_when_observable(system):
+    A, B, C, D = system
+    assert util.observable(A, C)
+
+
+def test_observable_when_unobservable(system):
+    A, B, C, D = system
+    C = np.zeros(C.shape)
+    assert not util.observable(A, C)
+
+
+def test_observable_when_observable_case_one():
+    A = np.matrix([
+        [0, 1, 0],
+        [0, 0, 1],
+        [-1, 4, 5]])
+    C = np.matrix([
+        [0, 1, 0],
+        [0, 0, 1]])
+    assert util.observable(A, C)

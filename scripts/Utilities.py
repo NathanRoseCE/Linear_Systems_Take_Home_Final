@@ -1,7 +1,8 @@
 from typing import List, Tuple, Dict, Callable
 import numpy as np
 import matplotlib.pyplot as plt
-from control import lyap
+import control
+import itertools
 from numpy.linalg import inv
 from jinja2 import Environment, FileSystemLoader
 import os
@@ -72,8 +73,10 @@ def feedback(system: Tuple[np.matrix],
     will satisfy eigvals(A - BK) == desiredEigs
     """
     A, B, C, D = system
+    if not controllable(A, B):
+        raise ValueError("{A,B} must be controllable")
     f = F(desiredEig)
-    T = lyap(A, -f, -B*K0)
+    T = control.lyap(A, -f, -B*K0)
     K = K0 * inv(T)
     desiredEigs = eigs(desiredEig)
     actualEigs = np.linalg.eigvals(A-B*K)
@@ -91,8 +94,12 @@ def observer(system: Tuple[np.matrix],
     will satisfy eigvals(A - LC) == desiredEigs
     """
     A, B, C, D = system
+    if not observable(A, C):
+        print(f"A = {A}")
+        print(f"C = {C}")
+        raise ValueError("{A,C} must be observable")
     f = F(desiredEig)
-    T = lyap(-f, A, -L0*C)
+    T = control.lyap(-f, A, -L0*C)
     L = np.linalg.inv(T)*L0
     desiredEigs = eigs(desiredEig)
     actualEigs = np.linalg.eigvals(A-L*C)
@@ -156,3 +163,26 @@ def eigs(eigs: Dict[str, float]) -> List[complex]:
             continue
         return_eigs.append(eigVal)
     return return_eigs
+
+
+def controllable(A: np.matrix, B: np.matrix) -> bool:
+    """
+    Determines if a given system is controllable
+    """
+    g_c = control.ctrb(A, B)
+    vectors = [np.array(g_c[:, i])[np.newaxis].T for i in range(g_c.shape[1])]
+    permutations = itertools.combinations(vectors, A.shape[1])
+    return not np.any(0 == np.array([np.linalg.det(np.concatenate(permutation, axis=1))
+                                     for permutation in permutations]))
+
+
+def observable(A: np.matrix, C: np.matrix) -> bool:
+    """
+    Determines if a given system is observable
+    """
+    g_o = control.obsv(A, C)
+    vectors = [np.array(g_o[i][np.newaxis]) for i in range(g_o.shape[0])]
+    permutations = itertools.combinations(vectors, A.shape[0])
+    perms = [perm for perm in permutations]
+    return np.any(0 != np.array([np.linalg.det(np.concatenate(perm, axis=0))
+                                 for perm in perms]))
