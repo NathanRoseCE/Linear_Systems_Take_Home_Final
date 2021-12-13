@@ -48,7 +48,7 @@ def three_two(config: json) -> bool:
     x_0 = config["two_initial"]
     inputs, timeSteps = gen_inputs(config["stopTime"], config["dt"])
     outputs = Model.linearWithFeedback(system, k, x_0, config["dt"], inputs)
-    graph_results(timeSteps, outputs, config["two_graph"], "3-2", ["Y", "Theta"])
+    graph_results(timeSteps, outputs, f'{config["outdir"]}/{config["two_graph"]}', "3-2", ["Y", "Theta"])
     print_results_two(config, system, f, K0, k)
     return True
 
@@ -67,7 +67,7 @@ def three_three(config: json) -> bool:
                                 k,
                                 config,
                                 config["dt"])
-    graph_results(timeSteps, outputs, config["three_graph"], "Nonlinear feedback sample", ["theta"])
+    graph_results(timeSteps, outputs, f'{config["outdir"]}/{config["three_graph"]}', "Nonlinear feedback sample", ["theta"])
     thetaLimit = theta_limit(config, k)
     print_results_three(config, x_0, thetaLimit)
     return True
@@ -96,7 +96,7 @@ def three_four(config: json) -> bool:
                 [linear.item((0, 0))]
             ])
         )
-    graph_results(timeSteps, outs, config["four_graph"], "Comparison", ["non-linear", "linear"])
+    graph_results(timeSteps, outs, f'{config["outdir"]}/{config["four_graph"]}', "Comparison", ["non-linear", "linear"])
     print_results_four(config)
     return True
 
@@ -245,7 +245,7 @@ def print_results_two(config: json,
                    k0=k0,
                    f=f,
                    k=k,
-                   graph=config["two_graph"])
+                   graph=f'{config["outdir"]}/{config["two_graph"]}')
 
 
 def print_results_three(config: json,
@@ -259,7 +259,7 @@ def print_results_three(config: json,
                    f'{config["outdir"]}/{config["tex_three_fragment"]}',
                    code_str=code_str,
                    x_0=x0Sample,
-                   graph=config["three_graph"],
+                   graph=f'{config["outdir"]}/{config["three_graph"]}',
                    stopTime=config["stopTime"],
                    threshold=config["threshold"],
                    tolerence=(1*(10**-LatexFormat.ROUND_TO)),
@@ -271,7 +271,7 @@ def print_results_four(config: json):
     templateFile = f'{config["templatedir"]}/{config["tex_four_fragment"]}.j2'
     renderTemplate(templateFile,
                    f'{config["outdir"]}/{config["tex_four_fragment"]}',
-                   graph=config["four_graph"])
+                   graph=f'{config["outdir"]}/{config["four_graph"]}')
 
 
 def output_overall_results(config: json):
