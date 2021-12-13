@@ -24,7 +24,7 @@ def imaginary(val: Dict[str, float]) -> str:
     """
     return (round_float(val["real"]) +
             r" \pm " +
-            round_float(val["imaginary"]) +
+            round_float(abs(val["imaginary"])) +
             "j")
 
 

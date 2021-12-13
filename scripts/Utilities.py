@@ -23,7 +23,7 @@ def F(desiredEigens: List[dict]):
         if "imaginary" in desired_eig:
             imaginary = desired_eig["imaginary"]
             F[i][i] = real
-            imaginary = abs(imaginary)
+            # imaginary = abs(imaginary)
             F[i+1][i] = -imaginary
             F[i][i+1] = imaginary
             i = i + 1

@@ -18,7 +18,7 @@
     "c_graph": "one_c.png",
     "d_graph": "one_d.png",
     "dt": 0.01,
-    "stopTime": 5,
+    "stopTime": 10,
     "Q": [[1, 0],
 	  [0, 1]],
     "R": [[1]],

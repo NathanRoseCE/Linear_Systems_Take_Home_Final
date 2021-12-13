@@ -4,7 +4,7 @@ import control
 import json
 import os
 from typing import Tuple, List, Dict, Union
-from Utilities import feedback, gen_inputs, graph_results, observer, renderTemplate
+from Utilities import feedback, gen_inputs, graph_results, observer, renderTemplate, F
 import Model
 import math
 
@@ -125,7 +125,7 @@ def one_d(config: json) -> bool:
     x_e_0 = np.matrix(config["x_e_0"])
     observerEig = [{
         "real": eig["real"]*config["observerScale"],
-        "imaginary": eig["imaginary"]
+        "imaginary": -abs(eig["imaginary"])
     } for eig in desired_eigenvalues]
     L = observer(system, observerEig, L0)
     outputs = Model.linearFullObserverWithFeedback(system=system,
